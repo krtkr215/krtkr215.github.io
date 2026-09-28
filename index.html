@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>점사 카드 뽑기</title>
+<meta name="theme-color" content="#0E2A22">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="카드 뽑기">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#E3DED3; --ink:#1F1B18; --muted:#5F5A50; --line:#C3BBAB; --panel:#EFEBE2;
+  --velvet:#0E2A22; --velvet2:#081B15; --tableink:#EDE3C8;
+  --gold:#C9A45C; --gold-hi:#F1DDA2; --gold-lo:#7E6026;
+  --paper:#F7F0E0; --paperink:#2A2320; --verm:#9E3326; --focus:#9E3326;
+  --serif:"Gowun Batang","Nanum Myeongjo","AppleMyungjo","Batang",serif;
+  --latin:"Cormorant Garamond","Garamond","Times New Roman",serif;
+  --foil:linear-gradient(135deg,#7E6026 0%,#E9D08E 28%,#A9823A 48%,#F4E4AE 66%,#8F6C2C 100%);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C100E; --ink:#E9E2D2; --muted:#9C978B; --line:#2A302C; --panel:#141A17;
+    --velvet:#0C241D; --velvet2:#06140F; --paper:#ECE3CF; --focus:#E3B866;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C100E; --ink:#E9E2D2; --muted:#9C978B; --line:#2A302C; --panel:#141A17;
+  --velvet:#0C241D; --velvet2:#06140F; --paper:#ECE3CF; --focus:#E3B866;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.7;font-size:16px}
+.wrap{max-width:1160px;margin:0 auto;padding:28px 20px 56px}
+header{margin-bottom:22px}
+h1{font-size:clamp(1.9rem,5vw,2.8rem);line-height:1.15;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+h2{font-size:1.15rem;margin:0 0 10px}
+
+.controls{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:14px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row-label{font-size:.9rem;color:var(--muted);min-width:4.5em}
+.seg{position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:inline-block;padding:7px 14px;border:1px solid var(--line);border-radius:999px;cursor:pointer;font-size:.95rem;transition:background .15s,color .15s}
+.seg input:checked+span{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg input:focus-visible+span{outline:3px solid var(--focus);outline-offset:2px}
+.seg small{opacity:.7;margin-left:4px;font-size:.8em}
+.opt{display:inline-flex;gap:6px;align-items:center;font-size:.95rem;cursor:pointer}
+.opt input{accent-color:var(--verm);width:17px;height:17px}
+input[type=number],input[type=text]{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 10px}
+input[type=number]{width:5.5em}
+#question{flex:1;min-width:220px}
+input:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;cursor:pointer;color:inherit}
+.btn{padding:9px 18px;border-radius:6px;border:1px solid var(--ink);background:transparent;color:var(--ink)}
+.btn.primary{background:var(--verm);border-color:var(--verm);color:#FBF5E8;font-weight:700}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+#status{font-size:.9rem;color:var(--muted);min-height:1.4em}
+
+/* ---- 테이블 ---- */
+.table{position:relative;margin-top:18px;border-radius:16px;padding:26px 16px 24px;color:var(--tableink);overflow:hidden;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 38%,rgba(255,236,190,.10),transparent 70%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0 1px,transparent 1px 3px),
+    radial-gradient(ellipse at 50% 120%,var(--velvet2),var(--velvet) 70%);
+  box-shadow:inset 0 0 0 1px rgba(201,164,92,.55),inset 0 0 0 7px var(--velvet2),inset 0 0 0 8px rgba(201,164,92,.35),inset 0 0 80px rgba(0,0,0,.55)}
+.table-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 8px 18px;font-size:.95rem}
+.table-head .deckname{font-family:var(--serif);letter-spacing:.02em}
+.table-head .q{opacity:.92}
+.pickbar{display:flex;justify-content:center;align-items:center;gap:14px;flex-wrap:wrap;margin:18px 0 4px;font-size:.95rem}
+.pickbar b{font-family:var(--latin);font-size:1.25rem;background:var(--foil);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ghost{background:none;border:1px solid rgba(201,164,92,.6);color:var(--tableink);border-radius:999px;padding:5px 14px;font-size:.88rem}
+.ghost:focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+.empty{text-align:center;margin:44px auto;max-width:36ch;opacity:.88}
+.spread-scroll{overflow-x:auto;padding:6px 0 4px}
+
+.spread{--gap:calc(var(--cw)*.2)}
+.spread.flow{display:flex;flex-wrap:wrap;justify-content:center;gap:18px var(--gap)}
+.spread.grid{display:grid;grid-template-columns:repeat(var(--cols),var(--cw));column-gap:var(--gap);row-gap:14px;width:max-content;margin:0 auto}
+.spread.has-cross{--gap:calc(var(--cw)*.42)}
+.size-l{--cw:clamp(80px,23vw,150px)}
+.size-m{--cw:clamp(52px,15vw,110px)}
+.size-s{--cw:clamp(50px,8.6vw,84px)}
+.size-s.spread.grid{row-gap:8px;column-gap:6px}
+
+.slot{width:var(--cw);display:flex;flex-direction:column;align-items:center;gap:7px}
+.slot.cross{z-index:2;align-self:start}
+.slot.cross .host{transform:rotate(90deg) scale(.92)}
+.slot.cross .lab{visibility:hidden}
+.host{width:var(--cw);aspect-ratio:5/8;position:relative}
+.lab{font-size:.78rem;line-height:1.35;text-align:center;opacity:.9}
+.size-s .lab{font-size:.7rem;font-family:var(--latin);font-weight:600}
+.ph{position:absolute;inset:0;border-radius:calc(var(--cw)*.07);border:1px dashed rgba(201,164,92,.45);display:grid;place-items:center;font-family:var(--latin);font-size:calc(var(--cw)*.2);color:rgba(233,208,142,.55)}
+.ph.next{border-style:solid;border-color:rgba(241,221,162,.9);box-shadow:0 0 0 1px rgba(241,221,162,.25),0 0 22px rgba(241,221,162,.25);color:var(--gold-hi)}
+
+/* ---- 카드 ---- */
+.card{position:absolute;inset:0;padding:0;border:0;background:none;perspective:1000px;border-radius:calc(var(--cw)*.07)}
+.card:focus-visible{outline:2px solid var(--gold-hi);outline-offset:4px}
+.inner{position:relative;display:block;width:100%;height:100%;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.25,.8,.25,1)}
+.card.open .inner{transform:rotateY(180deg)}
+.card:not(.open):hover .inner{transform:translateY(-4px)}
+.face{position:absolute;inset:0;border-radius:calc(var(--cw)*.07);backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;
+  box-shadow:0 1px 0 rgba(0,0,0,.35),0 8px 18px rgba(0,0,0,.45)}
+.card.reveal::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;animation:glow 1.3s ease-out forwards}
+@keyframes glow{0%{box-shadow:0 0 0 0 rgba(241,221,162,0)}25%{box-shadow:0 0 34px 10px rgba(241,221,162,.55)}100%{box-shadow:0 0 0 0 rgba(241,221,162,0)}}
+
+.back{--bk:#1B2447;background:
+   radial-gradient(circle at 50% 50%,rgba(255,255,255,.08),transparent 62%),
+   repeating-conic-gradient(from 0deg at 50% 50%,rgba(233,208,142,.075) 0 1.5deg,transparent 1.5deg 5deg),
+   var(--bk)}
+.back svg{position:absolute;inset:0;width:100%;height:100%}
+.sheen{position:absolute;inset:-10%;background:linear-gradient(115deg,transparent 38%,rgba(255,243,210,.38) 50%,transparent 62%);transform:translateX(-130%);transition:transform .9s ease;pointer-events:none}
+.card:hover .sheen,.fcard:hover .sheen,.fcard:focus-visible .sheen{transform:translateX(130%)}
+.b-tarot{--bk:#1A2346}
+.b-len{--bk:#4E1717}
+.b-bel{--bk:#10284F}
+
+.front{transform:rotateY(180deg);color:var(--paperink);
+  background:radial-gradient(ellipse at 50% 35%,#FFFBF1,var(--paper) 70%);
+  box-shadow:inset 0 0 0 calc(var(--cw)*.03) var(--paper),inset 0 0 0 calc(var(--cw)*.04) var(--fr,#B8913F),inset 0 0 0 calc(var(--cw)*.055) var(--paper),inset 0 0 0 calc(var(--cw)*.06) var(--fr,#B8913F),0 1px 0 rgba(0,0,0,.35),0 8px 18px rgba(0,0,0,.45)}
+.fc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;padding:calc(var(--cw)*.15) calc(var(--cw)*.09) calc(var(--cw)*.11)}
+.front.rev .fc{transform:rotate(180deg)}
+.cn{position:absolute;top:calc(var(--cw)*.09);left:calc(var(--cw)*.11);font-family:var(--latin);font-weight:600;font-size:calc(var(--cw)*.13);line-height:1}
+.glyph{flex:1;display:grid;place-items:center;width:100%}
+.ct{font-weight:700;font-size:calc(var(--cw)*.125);line-height:1.2;word-break:keep-all}
+.cs{font-family:var(--latin);font-style:italic;font-size:calc(var(--cw)*.088);line-height:1.2;opacity:.75;margin-top:2px}
+.f-len .cs{font-family:var(--serif);font-style:normal}
+.size-s .cs{display:none}
+.size-s .ct{font-size:calc(var(--cw)*.16)}
+.size-s .cn{font-size:calc(var(--cw)*.16)}
+.roman{font-family:var(--latin);font-weight:600;font-size:calc(var(--cw)*.32);line-height:1;background:var(--foil);-webkit-background-clip:text;background-clip:text;color:transparent}
+.suit svg{width:calc(var(--cw)*.42);height:calc(var(--cw)*.42)}
+.s-wands{color:#A8392A}.s-cups{color:#2F5FA8}.s-swords{color:#4A5563}.s-pentacles{color:#9A7526}
+.inset{font-family:var(--latin);font-weight:600;font-size:calc(var(--cw)*.2);border:1px solid rgba(42,35,32,.5);border-radius:3px;padding:.1em .3em;background:#FFFDF6;line-height:1.1}
+.inset.red{color:#B0302A}
+.size-s .inset{font-size:calc(var(--cw)*.22)}
+.f-bel{border-top:calc(var(--cw)*.1) solid var(--pc)}
+.f-bel .cn{top:calc(var(--cw)*.15)}
+.planet{font-size:calc(var(--cw)*.4);line-height:1;color:var(--pc)}
+.f-blue{background:radial-gradient(ellipse at 50% 35%,#3A70C0,#224C92 75%);color:#F2F5FB;--fr:#E9D08E;border-top:0}
+.f-blue .planet{color:#F1DDA2}
+
+/* ---- 펼쳐진 덱 ---- */
+.fanwrap{margin-top:8px;transition:opacity .5s ease,max-height .7s ease;max-height:900px}
+.fanwrap.gone{opacity:0;max-height:0;overflow:hidden;pointer-events:none}
+.fan{position:relative;width:100%;--fw:clamp(46px,6.6vw,74px)}
+.fcard{position:absolute;left:0;top:0;width:var(--fw);aspect-ratio:5/8;padding:0;border:0;background:none;--cw:var(--fw);
+  transform-origin:50% 100%;transform:translate(var(--x,0),var(--y,0)) rotate(var(--r,0deg)) translateY(var(--lift,0px));
+  transition:transform .55s cubic-bezier(.2,.8,.2,1);border-radius:calc(var(--fw)*.07)}
+.fcard .face{box-shadow:0 1px 0 rgba(0,0,0,.4),0 4px 10px rgba(0,0,0,.45)}
+.fan.ready .fcard{transition-delay:0s!important;transition-duration:.25s}
+.fan.ready .fcard:hover,.fan.ready .fcard:focus-visible{--lift:-22px}
+.fcard:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.fcard.taken{visibility:hidden}
+.fan.locked .fcard{cursor:default}
+
+.flying{position:fixed;z-index:1000;pointer-events:none;--cw:80px;border-radius:7px;
+  transition:left .7s cubic-bezier(.22,.8,.2,1),top .7s cubic-bezier(.22,.8,.2,1),width .7s cubic-bezier(.22,.8,.2,1),height .7s cubic-bezier(.22,.8,.2,1),transform .7s cubic-bezier(.22,.8,.2,1)}
+.flying .face{box-shadow:0 18px 40px rgba(0,0,0,.55)}
+.dust{position:fixed;width:5px;height:5px;border-radius:50%;pointer-events:none;z-index:1001;background:radial-gradient(circle,#FFF4CF,#D9B45F 60%,transparent 70%)}
+
+/* ---- 아래 패널 ---- */
+.below{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-top:18px}
+@media (max-width:760px){.below{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.results{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.results li{padding-bottom:10px;border-bottom:1px solid var(--line)}
+.results li:last-child{border-bottom:0;padding-bottom:0}
+.r-pos{font-size:.85rem;color:var(--muted)}
+.r-name{font-weight:700}
+.r-rev{color:var(--verm);font-size:.9rem;margin-left:4px}
+.r-sub{font-family:var(--latin);font-style:italic;color:var(--muted);margin-left:6px}
+.r-kw{font-size:.92rem}
+.r-closed{color:var(--muted);font-size:.92rem}
+.hint{color:var(--muted);font-size:.92rem;margin:0}
+.history{list-style:none;margin:0;padding:0;display:grid;gap:10px;max-height:520px;overflow:auto}
+.history li{border-bottom:1px solid var(--line);padding-bottom:10px;font-size:.92rem}
+.h-meta{color:var(--muted);font-size:.85rem}
+.h-q{font-weight:700}
+.h-cards{word-break:keep-all}
+.linkbtn{background:none;border:0;padding:0;color:var(--verm);text-decoration:underline;text-underline-offset:3px;font-size:.88rem}
+.linkbtn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+
+.dealt .slot{animation:deal .5s cubic-bezier(.2,.8,.3,1) both;animation-delay:calc(var(--d)*45ms)}
+@keyframes deal{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8A6A2B"/><stop offset=".3" stop-color="#EBD28F"/><stop offset=".5" stop-color="#B08A3E"/><stop offset=".7" stop-color="#F4E4AE"/><stop offset="1" stop-color="#8A6A2B"/>
+    </linearGradient>
+  </defs>
+</svg>
+<div class="wrap">
+  <header>
+    <h1>점사 카드 뽑기</h1>
+    <p>타로 78장, 르노르망 36장, 호로스코프 벨린 53장. 덱을 섞어 테이블에 펼친 뒤, 뒷면을 보고 끌리는 카드를 직접 골라 배열에 놓습니다.</p>
+  </header>
+
+  <section class="controls" aria-label="뽑기 설정">
+    <div class="row" role="radiogroup" aria-label="덱">
+      <span class="row-label">덱</span>
+      <label class="seg"><input type="radio" name="deck" value="tarot" checked><span>타로<small>78</small></span></label>
+      <label class="seg"><input type="radio" name="deck" value="len"><span>르노르망<small>36</small></span></label>
+      <label class="seg"><input type="radio" name="deck" value="bel"><span>호로스코프 벨린<small>53</small></span></label>
+    </div>
+    <div class="row" role="radiogroup" aria-label="배열" id="spreadRow"></div>
+    <div class="row" role="radiogroup" aria-label="뽑는 방식">
+      <span class="row-label">방식</span>
+      <label class="seg"><input type="radio" name="mode" value="pick" checked><span>직접 고르기</span></label>
+      <label class="seg"><input type="radio" name="mode" value="auto"><span>자동으로 뽑기</span></label>
+    </div>
+    <div class="row">
+      <span class="row-label">옵션</span>
+      <label class="opt" id="optRev"><input type="checkbox" id="rev" checked> 역방향 포함</label>
+      <label class="opt" id="optBlue" hidden><input type="checkbox" id="blue" checked> 블루 카드 포함</label>
+      <label class="opt" id="optCount" hidden>장수 <input type="number" id="count" min="1" max="78" value="5"></label>
+    </div>
+    <div class="row">
+      <label class="row-label" for="question">질문</label>
+      <input type="text" id="question" placeholder="비워 두어도 됩니다" maxlength="120">
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="drawBtn">섞어서 펼치기</button>
+      <button class="btn" id="flipAllBtn" disabled>모두 뒤집기</button>
+      <button class="btn" id="copyBtn" disabled>결과 복사</button>
+      <span id="status" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section class="table" aria-label="카드 테이블" id="table"></section>
+
+  <div class="below">
+    <section class="panel" aria-labelledby="resH">
+      <h2 id="resH">뽑힌 카드</h2>
+      <div id="results"><p class="hint">아직 뽑은 카드가 없습니다.</p></div>
+    </section>
+    <section class="panel" aria-labelledby="histH">
+      <div class="panel-head"><h2 id="histH">기록</h2><button class="linkbtn" id="clearHist" hidden>기록 지우기</button></div>
+      <ul class="history" id="history"></ul>
+      <p class="hint" id="histEmpty">배열을 완성할 때마다 이 브라우저에 최근 30회가 저장됩니다.</p>
+    </section>
+  </div>
+</div>
+<script>
+/* ---------- 난수 ---------- */
+function rint(n){const a=new Uint32Array(1);const lim=Math.floor(4294967296/n)*n;let x;do{crypto.getRandomValues(a);x=a[0]}while(x>=lim);return x%n}
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=rint(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- 타로 ---------- */
+const ROMAN=["0","I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI"];
+const MAJ=[
+["바보","The Fool","시작, 자유, 모험","무모함, 경솔"],
+["마법사","The Magician","의지, 창조, 능력","속임수, 미숙"],
+["여사제","The High Priestess","직관, 비밀, 내면","감춤, 단절"],
+["여황제","The Empress","풍요, 모성, 결실","과잉, 의존"],
+["황제","The Emperor","권위, 질서, 책임","경직, 독단"],
+["교황","The Hierophant","전통, 가르침, 신뢰","형식주의, 반발"],
+["연인","The Lovers","선택, 결합, 조화","불화, 갈등"],
+["전차","The Chariot","승리, 추진, 통제","폭주, 방향 상실"],
+["힘","Strength","인내, 용기, 부드러운 통제","자기 의심, 나약함"],
+["은둔자","The Hermit","성찰, 탐구, 고독","고립, 회피"],
+["운명의 수레바퀴","Wheel of Fortune","전환점, 흐름, 기회","정체, 불운"],
+["정의","Justice","공정, 균형, 판단","불공정, 편향"],
+["매달린 사람","The Hanged Man","희생, 관점 전환, 유보","헛된 희생, 지연"],
+["죽음","Death","끝과 시작, 변화","변화 거부, 미련"],
+["절제","Temperance","조화, 절충, 치유","불균형, 과함"],
+["악마","The Devil","집착, 유혹, 속박","해방, 끊어냄"],
+["탑","The Tower","급변, 붕괴, 각성","위기 모면, 두려움"],
+["별","The Star","희망, 영감, 회복","낙담, 실망"],
+["달","The Moon","불안, 환상, 무의식","혼란 해소, 진실 드러남"],
+["태양","The Sun","성공, 활력, 기쁨","일시적 침체, 과신"],
+["심판","Judgement","부활, 소명, 결단","자책, 망설임"],
+["세계","The World","완성, 통합, 성취","미완, 지연"]];
+const RANKS=[["에이스","Ace","A"],["2","Two","2"],["3","Three","3"],["4","Four","4"],["5","Five","5"],["6","Six","6"],["7","Seven","7"],["8","Eight","8"],["9","Nine","9"],["10","Ten","10"],["페이지","Page","P"],["나이트","Knight","Kn"],["퀸","Queen","Q"],["킹","King","K"]];
+const SUITS=[
+{k:"wands",ko:"완드",en:"Wands",kw:["새로운 열정, 영감","계획, 전망","확장, 결실을 기다림","축하, 안정","경쟁, 마찰","승리, 인정","방어, 입장 고수","신속, 빠른 진전","경계, 끈기","과중한 부담","소식, 호기심","돌진, 모험","자신감, 매력","비전, 리더십"]},
+{k:"cups",ko:"컵",en:"Cups",kw:["새로운 감정, 사랑","교감, 파트너십","축하, 우정","권태, 무관심","상실, 후회","추억, 순수","환상, 많은 선택지","떠남, 새 의미 찾기","만족, 소원 성취","가정의 행복","감성, 제안","로맨스, 제의","공감, 배려","감정의 균형, 포용"]},
+{k:"swords",ko:"소드",en:"Swords",kw:["명료함, 돌파","교착, 결정 보류","상처, 슬픔","휴식, 회복","갈등, 씁쓸한 승리","이동, 전환","전략, 기만","속박, 자기 제한","불안, 근심","끝, 바닥","관찰, 경계","성급함, 직진","냉철함, 독립","판단력, 권위"]},
+{k:"pentacles",ko:"펜타클",en:"Pentacles",kw:["새로운 기회, 물질적 시작","균형 잡기, 유연성","협업, 기술","소유, 보수성","결핍, 소외","나눔, 주고받음","인내, 중간 점검","숙련, 노력","자립, 여유","유산, 장기적 안정","배움, 성실","꾸준함, 신중","실용적 보살핌","성취, 재력"]}];
+const SUITSVG={
+wands:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M11 35 L29 5"/><path d="M17 25 l-5 -2 M21 18 l5 2 M24 13 l-5 -2"/></svg>',
+cups:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M9 7 H31 C31 17 27 22 20 22 C13 22 9 17 9 7 Z"/><path d="M20 22 V31 M12 33 H28"/></svg>',
+swords:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M20 3 L22.5 8 V26 H17.5 V8 Z"/><path d="M12 26 H28 M20 26 V35"/></svg>',
+pentacles:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><circle cx="20" cy="20" r="15"/><path d="M20 7.5 L27.3 30 L8.2 16.2 H31.8 L12.7 30 Z"/></svg>'};
+const TAROT=[];
+MAJ.forEach((m,i)=>TAROT.push({id:"T"+i,kind:"major",num:ROMAN[i],title:m[0],sub:m[1],kw:m[2],rkw:m[3]}));
+SUITS.forEach(s=>RANKS.forEach((r,i)=>TAROT.push({id:"T"+s.k+i,kind:"minor",suit:s.k,num:r[2],title:s.ko+" "+r[0],sub:r[1]+" of "+s.en,kw:s.kw[i]})));
+
+/* ---------- 르노르망 ---------- */
+const LEN=[["기수","9♥","소식, 방문, 빠른 전개"],["클로버","6♦","작은 행운, 기회"],["배","10♠","여행, 거리, 무역"],["집","K♥","가정, 안정, 부동산"],["나무","7♥","건강, 성장, 뿌리"],["구름","K♣","혼란, 불확실"],["뱀","Q♣","복잡함, 우회, 경쟁자"],["관","9♦","끝, 소진, 질병"],["꽃다발","Q♠","선물, 호의, 기쁨"],["낫","J♦","갑작스러운 단절, 결단"],["채찍","J♣","갈등, 반복, 논쟁"],["새","7♦","대화, 긴장, 수다"],["아이","J♠","새 시작, 작음, 순수"],["여우","9♣","영리함, 경계, 일"],["곰","10♣","힘, 재정, 보호자"],["별","6♥","희망, 방향, 명확함"],["황새","Q♥","변화, 이동, 개선"],["개","10♥","친구, 신뢰, 충실"],["탑","6♠","기관, 권위, 고립"],["정원","8♠","모임, 대중, 사교"],["산","8♣","장애, 지연"],["갈림길","Q♦","선택, 갈래"],["쥐","7♣","손실, 소모, 걱정"],["하트","J♥","사랑, 애정"],["반지","A♣","약속, 계약, 결속"],["책","10♦","비밀, 학습, 지식"],["편지","7♠","문서, 연락"],["남자","A♥","남성 질문자, 남성"],["여자","A♠","여성 질문자, 여성"],["백합","K♠","성숙, 평온, 품위"],["태양","A♦","성공, 활력"],["달","8♥","명예, 감정, 인정"],["열쇠","8♦","해결, 확실함"],["물고기","K♦","돈, 사업, 흐름"],["닻","9♠","안정, 지속"],["십자가","6♣","부담, 숙명, 신념"]];
+const LENORMAND=LEN.map((c,i)=>({id:"L"+(i+1),num:i+1,title:c[0],sub:c[1],kw:c[2]}));
+
+/* ---------- 호로스코프 벨린 ---------- */
+const HB=[["남자의 생각","Pensée de l’Homme","남성의 의지와 생각"],["여자의 생각","Pensée de la Femme","여성의 존재와 생각"],["운명","Destinée","인생의 전환점"],["꽃","La Fleur","새로움, 재생"],["상승","Élévation","향상, 승진"],["보상","Récompenses","인정받는 노력"],["충실","Fidélité","신의, 우정"],["영예","Distinctions","영예, 수상"],["선물","Cadeaux","관대함, 선물"],["휴식","Repos","휴식, 일시 정지"],["출발","Départ","떠남, 새 출발"],["드러남","Révélation","비밀이 밝혀짐"],["평안","Bien-être","충만함, 편안함"],["악마","Le Diable","유혹, 집착"],["가정","Foyer","가정의 안정"],["물","L’Eau","감수성, 직관"],["이동","Mouvements","변화, 과도기"],["침체","Dépression","어두운 시기, 낙심"],["빛","Lumière","명료함, 진실"],["번영","Prospérité","풍요, 재물"],["꿀벌","L’Abeille","노동, 건설적 노력"],["까치","La Pie","소문, 손실"],["메시지","Message","소식, 연락"],["카두케우스","Le Caducée","건강, 상거래"],["진정","Apaisement","화해, 누그러짐"],["기쁨","Joie","즐거움, 환희"],["큐피드","Cupidon","싹트는 사랑"],["결합","Union","약속, 결합"],["둥지","Le Nid","가족의 보호"],["풍향계","La Girouette","불안정, 변덕"],["마녀","La Sorcière","배신, 험담"],["열정","Passions","강렬한 욕망"],["사슬에 묶인 자","L’Enchaîné","구속, 막힘"],["정의","Justice","균형, 판결"],["협상","Négociations","대화, 합의"],["용","Le Dragon","경쟁, 적대"],["위험","Dangers","경고, 위험"],["열의","Ardeur","행동력, 열의"],["이상","L’Idéal","꿈, 포부"],["지지","Soutien","도움, 후원"],["지혜","Sagesse","분별, 절제"],["유산","Patrimoine","상속, 물려받음"],["우연","Hasard","뜻밖의 기회"],["명성","Célébrité","명성, 인정"],["지복","Félicité","성취, 깊은 행복"],["고독","Solitude","은둔, 내면 성찰"],["불운","Malchance","시련, 어려운 시기"],["보호","Protection","도움, 가호"],["끝","La Fin","한 주기의 마무리"],["장애물","Obstacles","방해, 저항"],["추락","Déchéance","하락, 실추"],["미로","Labyrinthe","막다른 길, 혼란"]];
+const HBCOL=["#C4452F","#D98A1C","#3E8A5B","#2F6FA8","#7A4A9A","#C2567E"];
+const BELLINE=HB.map((c,i)=>({id:"H"+(i+1),num:i+1,title:c[0],sub:c[1],kw:c[2],sym:"✺",color:HBCOL[i%6]}));
+const BLUE={id:"H0",num:"",title:"블루 카드",sub:"La Carte Bleue",blue:true,sym:"✦",color:"#2A5BA6",kw:"행운, 부적"};
+
+const DECKS={
+ tarot:{name:"타로",cards:TAROT},
+ len:{name:"르노르망",cards:LENORMAND},
+ bel:{name:"호로스코프 벨린",cards:BELLINE}};
+const BYID={};[...TAROT,...LENORMAND,...BELLINE,BLUE].forEach(c=>BYID[c.id]=c);
+
+/* ---------- 배열 ---------- */
+const nineGrid=Array.from({length:9},(_,i)=>({l:i===4?"중심":"",c:i%3+1,r:Math.floor(i/3)+1}));
+const gtGrid=Array.from({length:36},(_,i)=>({l:"",c:i%9+1,r:Math.floor(i/9)+1}));
+const SPREADS={
+ tarot:[
+  {id:"one",name:"한 장",pos:[{l:"오늘의 메시지"}]},
+  {id:"three",name:"세 장",pos:[{l:"과거"},{l:"현재"},{l:"미래"}]},
+  {id:"celtic",name:"켈틱 크로스",cols:4,pos:[
+    {l:"현재 상황",c:2,r:2},{l:"장애·교차",c:2,r:2,x:1},{l:"의식·목표",c:2,r:1},{l:"기반·무의식",c:2,r:3},
+    {l:"가까운 과거",c:1,r:2},{l:"가까운 미래",c:3,r:2},{l:"자신",c:4,r:4},{l:"주변 환경",c:4,r:3},{l:"희망과 두려움",c:4,r:2},{l:"결과",c:4,r:1}]},
+  {id:"custom",name:"직접 지정"}],
+ len:[
+  {id:"one",name:"한 장",pos:[{l:"오늘의 카드"}]},
+  {id:"three",name:"세 장",pos:[{l:"주제"},{l:"전개"},{l:"결말"}]},
+  {id:"five",name:"다섯 장",pos:[{l:"과거"},{l:"가까운 과거"},{l:"중심"},{l:"가까운 미래"},{l:"미래"}]},
+  {id:"nine",name:"9장 박스",cols:3,pos:nineGrid},
+  {id:"gt",name:"그랑 타블로",cols:9,pos:gtGrid,small:true},
+  {id:"custom",name:"직접 지정"}],
+ bel:[
+  {id:"one",name:"한 장",pos:[{l:"오늘의 카드"}]},
+  {id:"three",name:"세 장",pos:[{l:"과거"},{l:"현재"},{l:"미래"}]},
+  {id:"cross",name:"십자 5장",cols:3,pos:[{l:"긍정 요소",c:1,r:2},{l:"부정 요소",c:3,r:2},{l:"조언",c:2,r:1},{l:"답",c:2,r:3},{l:"앞으로의 전개",c:2,r:2}]},
+  {id:"custom",name:"직접 지정"}]};
+function spreadFor(deck,id,n){
+  const s=SPREADS[deck].find(x=>x.id===id)||SPREADS[deck][0];
+  if(s.id==="custom") return {...s,pos:Array.from({length:n},()=>({l:""}))};
+  return s;
+}
+
+
+/* ---------- 상태 ---------- */
+const $=s=>document.querySelector(s);
+const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+const state={deck:"tarot",spread:"three",mode:"pick",reading:null};
+const HKEY="card-draw-history-v1";
+let history=[];
+try{history=JSON.parse(localStorage.getItem(HKEY)||"[]");if(!Array.isArray(history))history=[];history=history.filter(h=>h&&Array.isArray(h.cards)&&h.cards.every(cd=>cd&&BYID[cd.id]))}catch(e){history=[]}
+function saveHistory(){try{localStorage.setItem(HKEY,JSON.stringify(history.slice(0,30)))}catch(e){}}
+
+/* ---------- 카드 뒷면 ---------- */
+const BACKSVG=`<svg viewBox="0 0 100 160" aria-hidden="true">
+<rect x="5" y="5" width="90" height="150" rx="5" fill="none" stroke="url(#gold)" stroke-width="1.8"/>
+<rect x="9.5" y="9.5" width="81" height="141" rx="3" fill="none" stroke="url(#gold)" stroke-width=".6"/>
+<g fill="url(#gold)"><path d="M9.5 9.5h9l-9 9z"/><path d="M90.5 9.5h-9l9 9z"/><path d="M9.5 150.5h9l-9-9z"/><path d="M90.5 150.5h-9l9-9z"/></g>
+<g fill="none" stroke="url(#gold)" stroke-width=".8"><path d="M34 24 Q50 14 66 24"/><path d="M40 27 Q50 21 60 27"/><path d="M34 136 Q50 146 66 136"/><path d="M40 133 Q50 139 60 133"/></g>
+<g transform="translate(50 80)">
+<circle r="25" fill="none" stroke="url(#gold)" stroke-width="1.3"/>
+<circle r="20.5" fill="none" stroke="url(#gold)" stroke-width=".5" stroke-dasharray="1.2 2"/>
+<path d="M0-34L4.5-6 34 0 4.5 6 0 34-4.5 6-34 0-4.5-6z" fill="url(#gold)"/>
+<path d="M0-16L3-3 16 0 3 3 0 16-3 3-16 0-3-3z" fill="url(#gold)" transform="rotate(45)" opacity=".85"/>
+<circle r="4.2" fill="var(--bk)" stroke="url(#gold)" stroke-width="1"/>
+</g></svg><span class="sheen"></span>`;
+const backFace=deck=>`<span class="face back b-${deck}" aria-hidden="true">${BACKSVG}</span>`;
+
+/* ---------- 설정 UI ---------- */
+function poolSize(){return DECKS[state.deck].cards.length+(state.deck==="bel"&&$("#blue").checked?1:0)}
+function renderSpreadRow(){
+  const list=SPREADS[state.deck];
+  if(!list.find(s=>s.id===state.spread)) state.spread="three";
+  $("#spreadRow").innerHTML='<span class="row-label">배열</span>'+list.map(s=>
+    `<label class="seg"><input type="radio" name="spread" value="${s.id}"${s.id===state.spread?" checked":""}><span>${s.name}${s.pos&&s.pos.length>1?`<small>${s.pos.length}</small>`:""}</span></label>`).join("");
+  $("#optRev").hidden=state.deck!=="tarot";
+  $("#optBlue").hidden=state.deck!=="bel";
+  $("#optCount").hidden=state.spread!=="custom";
+  $("#count").max=poolSize();
+}
+function updateDrawLabel(){$("#drawBtn").textContent=state.mode==="pick"?"섞어서 펼치기":"섞고 뽑기"}
+document.querySelectorAll('input[name=deck]').forEach(r=>r.addEventListener("change",e=>{state.deck=e.target.value;renderSpreadRow()}));
+document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener("change",e=>{state.mode=e.target.value;updateDrawLabel()}));
+$("#spreadRow").addEventListener("change",e=>{if(e.target.name==="spread"){state.spread=e.target.value;$("#optCount").hidden=state.spread!=="custom"}});
+$("#blue").addEventListener("change",()=>{$("#count").max=poolSize()});
+
+/* ---------- 시작 ---------- */
+function start(){
+  const deck=state.deck;
+  const cards=DECKS[deck].cards.slice();
+  if(deck==="bel"&&$("#blue").checked) cards.push(BLUE);
+  let n;
+  if(state.spread==="custom"){n=Math.max(1,Math.min(cards.length,parseInt($("#count").value,10)||1));$("#count").value=n}
+  else n=SPREADS[deck].find(s=>s.id===state.spread).pos.length;
+  const useRev=deck==="tarot"&&$("#rev").checked;
+  const pool=shuffle(cards).map(c=>({id:c.id,rev:useRev?rint(2)===1:false}));
+  const sp=spreadFor(deck,state.spread,n);
+  const R={deck,spread:state.spread,spreadName:sp.name,question:$("#question").value.trim(),time:Date.now(),n,
+    pool,cards:new Array(n).fill(null),open:new Array(n).fill(false),placed:0,complete:false,mode:state.mode};
+  state.reading=R;
+  if(state.mode==="auto"){
+    R.cards=pool.slice(0,n);R.placed=n;finish(false);
+    renderTable({deal:true});
+    status(`${DECKS[deck].name} ${n}장을 뽑았습니다. 카드를 눌러 뒤집으세요.`);
+  }else{
+    renderTable({fan:true});
+    status(`덱을 섞어 펼쳤습니다. ${n}장을 골라 주세요.`);
+  }
+}
+function finish(save=true){
+  const R=state.reading;R.complete=true;
+  history.unshift({deck:R.deck,spread:R.spread,spreadName:R.spreadName,question:R.question,time:R.time,cards:R.cards});
+  history=history.slice(0,30);saveHistory();renderHistory();
+}
+
+/* ---------- 카드 앞면 ---------- */
+function frontHTML(deck,c,rev){
+  if(deck==="tarot"){
+    const g=c.kind==="major"?`<span class="roman">${c.num}</span>`:`<span class="suit s-${c.suit}">${SUITSVG[c.suit]}</span>`;
+    return `<span class="face front f-tarot${rev?" rev":""}" aria-hidden="true"><span class="fc">${c.kind==="minor"?`<span class="cn">${c.num}</span>`:""}<span class="glyph">${g}</span><span class="ct">${c.title}</span><span class="cs">${c.sub}</span></span></span>`;
+  }
+  if(deck==="len"){
+    const red=/[♥♦]/.test(c.sub);
+    return `<span class="face front f-len" aria-hidden="true"><span class="fc"><span class="cn">${c.num}</span><span class="glyph"><span class="inset${red?" red":""}">${c.sub}</span></span><span class="ct">${c.title}</span><span class="cs">${c.kw.split(",")[0]}</span></span></span>`;
+  }
+  return `<span class="face front f-bel${c.blue?" f-blue":""}" aria-hidden="true" style="--pc:${c.color}"><span class="fc">${c.num!==""?`<span class="cn">${c.num}</span>`:""}<span class="glyph"><span class="planet">${c.sym}</span></span><span class="ct">${c.title}</span><span class="cs">${c.sub}</span></span></span>`;
+}
+const labelOf=(p,i)=>p&&p.l?`${i+1}. ${p.l}`:`${i+1}`;
+const nameOf=(c,rev)=>c.title+(rev?" (역방향)":"");
+
+/* ---------- 테이블 ---------- */
+function curSpread(){const R=state.reading;return spreadFor(R.deck,R.spread,R.n)}
+function hostHTML(i){
+  const R=state.reading,cd=R.cards[i],p=curSpread().pos[i];
+  if(!cd) return `<span class="ph${i===R.placed&&!R.complete?" next":""}">${i+1}</span>`;
+  const c=BYID[cd.id],open=R.open[i];
+  return `<button class="card${open?" open":""}" data-i="${i}" aria-label="${esc(labelOf(p,i)+" 자리, "+(open?nameOf(c,cd.rev):"눌러서 뒤집기"))}"><span class="inner">${backFace(R.deck)}${frontHTML(R.deck,c,cd.rev)}</span></button>`;
+}
+function renderTable(opt={}){
+  const R=state.reading,table=$("#table");
+  if(!R){table.innerHTML='<p class="empty">덱과 배열을 고르고 섞어서 펼치기를 누르세요. 펼쳐진 카드 뒷면 가운데 끌리는 카드를 골라 배열에 놓을 수 있습니다.</p>';renderResults();updateButtons();return}
+  const sp=curSpread(),n=R.n;
+  const size=sp.small||n>=20?"s":(sp.cols||n>5?"m":"l");
+  const hasCross=sp.pos.some(p=>p.x);
+  const slots=sp.pos.map((p,i)=>{
+    let lab=labelOf(p,i);
+    if(hasCross&&i===0){const xi=sp.pos.findIndex(q=>q.x);lab+=`<br>${labelOf(sp.pos[xi],xi)}`}
+    return `<div class="slot${p.x?" cross":""}" style="--d:${i};${p.c?`grid-column:${p.c};grid-row:${p.r};`:""}"><div class="host" data-host="${i}">${hostHTML(i)}</div><span class="lab">${lab}</span></div>`;
+  }).join("");
+  const when=new Date(R.time).toLocaleString("ko-KR",{dateStyle:"medium",timeStyle:"short"});
+  const showFan=opt.fan&&!R.complete;
+  table.innerHTML=`<div class="table-head"><span class="deckname">${DECKS[R.deck].name}, ${esc(R.spreadName)} (${n}장)</span><span>${R.question?`<span class="q">“${esc(R.question)}”</span> `:""}<span style="opacity:.65">${when}</span></span></div>
+  <div class="spread-scroll"><div class="spread ${sp.cols?"grid":"flow"} size-${size}${hasCross?" has-cross":""}${opt.deal?" dealt":""}" style="${sp.cols?`--cols:${sp.cols}`:""}">${slots}</div></div>
+  ${showFan?`<div class="fanwrap" id="fanwrap"><div class="pickbar"><span>남은 선택 <b id="left">${n-R.placed}</b> 장</span><button class="ghost" id="autoRest">나머지 자동으로 채우기</button></div><div class="fan" id="fan">${R.pool.map((_,k)=>`<button class="fcard" data-k="${k}" aria-label="펼쳐진 덱의 ${k+1}번째 카드 고르기">${backFace(R.deck)}</button>`).join("")}</div></div>`:""}`;
+  if(showFan) spreadFan();
+  renderResults();updateButtons();
+}
+function setHost(i){
+  const h=document.querySelector(`[data-host="${i}"]`);if(h) h.innerHTML=hostHTML(i);
+}
+function markNext(){
+  const R=state.reading;
+  document.querySelectorAll(".ph.next").forEach(e=>e.classList.remove("next"));
+  if(R.complete) return;
+  const ph=document.querySelector(`[data-host="${R.placed}"] .ph`);if(ph) ph.classList.add("next");
+}
+
+/* ---------- 부채꼴 펼치기 ---------- */
+function layoutFan(){
+  const fan=$("#fan");if(!fan)return;
+  const cards=[...fan.querySelectorAll(".fcard")],N=cards.length;if(!N)return;
+  const W=fan.clientWidth,fw=cards[0].offsetWidth,fh=fw*1.6;
+  const minStep=Math.max(9,fw*.17);
+  let rows=1;
+  while(rows<4&&(W-fw*1.9)/Math.max(1,Math.ceil(N/rows)-1)<minStep) rows++;
+  const per=Math.ceil(N/rows),rowGap=fh*.62,sag=fh*.14;
+  cards.forEach((el,k)=>{
+    const r=Math.floor(k/per),i=k%per,cnt=Math.min(per,N-r*per);
+    const t=cnt>1?i/(cnt-1):.5;
+    const span=Math.min(W-fw*1.9,(cnt-1)*fw*.85);
+    const x=(W-fw)/2-span/2+t*span;
+    const arc=Math.min(36,cnt*.9);
+    const y=26+r*rowGap+Math.pow((t-.5)*2,2)*sag;
+    el.style.setProperty("--x",x+"px");el.style.setProperty("--y",y+"px");el.style.setProperty("--r",((t-.5)*arc).toFixed(2)+"deg");
+    el.style.zIndex=k;el.dataset.rot=((t-.5)*arc).toFixed(2);
+  });
+  fan.style.height=(26+(rows-1)*rowGap+fh+sag+16)+"px";
+}
+function spreadFan(){
+  const fan=$("#fan");
+  const cards=[...fan.querySelectorAll(".fcard")];
+  layoutFan();
+  if(RM()){fan.classList.add("ready");markNext();return}
+  const W=fan.clientWidth,fw=cards[0].offsetWidth;
+  const finals=cards.map(el=>[el.style.getPropertyValue("--x"),el.style.getPropertyValue("--y"),el.style.getPropertyValue("--r")]);
+  cards.forEach((el,k)=>{
+    el.style.transition="none";
+    el.style.setProperty("--x",((W-fw)/2+(k%3-1)*1.5)+"px");
+    el.style.setProperty("--y","30px");
+    el.style.setProperty("--r",((k%5)-2)*.8+"deg");
+  });
+  fan.getBoundingClientRect();
+  requestAnimationFrame(()=>{
+    cards.forEach((el,k)=>{
+      el.style.transition="";el.style.transitionDelay=(120+k*9)+"ms";el.style.transitionDuration=".9s";
+      el.style.setProperty("--x",finals[k][0]);el.style.setProperty("--y",finals[k][1]);el.style.setProperty("--r",finals[k][2]);
+    });
+    setTimeout(()=>{cards.forEach(el=>{el.style.transitionDelay="";el.style.transitionDuration=""});fan.classList.add("ready")},1100+cards.length*9);
+  });
+  markNext();
+}
+let rsT;addEventListener("resize",()=>{clearTimeout(rsT);rsT=setTimeout(layoutFan,120)});
+
+/* ---------- 고르기와 날아가기 ---------- */
+function pick(k,instant){
+  const R=state.reading;if(!R||R.complete||R.placed>=R.n)return;
+  const el=document.querySelector(`.fcard[data-k="${k}"]`);if(!el||el.classList.contains("taken"))return;
+  const i=R.placed;
+  R.cards[i]=R.pool[k];R.placed++;
+  const left=$("#left");if(left) left.textContent=R.n-R.placed;
+  const host=document.querySelector(`[data-host="${i}"]`);
+  const isCross=!!(curSpread().pos[i]||{}).x;
+  const land=()=>{setHost(i);const c=host&&host.querySelector(".card");if(c&&!RM()){c.classList.add("reveal");setTimeout(()=>c.classList.remove("reveal"),1300)}renderResults();updateButtons()};
+  fly(el,host,R.deck,parseFloat(el.dataset.rot||0),isCross?90:0,isCross?.92:1,instant,land);
+  el.classList.add("taken");
+  markNext();
+  if(R.placed===R.n){
+    finish();
+    const fw=$("#fanwrap");if(fw){$("#fan").classList.add("locked");setTimeout(()=>fw.classList.add("gone"),450)}
+    status("배열이 완성되었습니다. 카드를 눌러 뒤집으세요.");
+  }
+}
+function fly(fromEl,toEl,deck,fromRot,toRot,toScale,instant,done){
+  if(!toEl||RM()||instant==="none"){done();return}
+  const a=fromEl.getBoundingClientRect(),b=toEl.getBoundingClientRect();
+  const aw=fromEl.offsetWidth,ah=fromEl.offsetHeight,bw=toEl.offsetWidth*toScale,bh=toEl.offsetHeight*toScale;
+  const f=document.createElement("div");f.className="flying";f.innerHTML=backFace(deck);
+  const set=(cx,cy,w,h,r)=>Object.assign(f.style,{left:(cx-w/2)+"px",top:(cy-h/2)+"px",width:w+"px",height:h+"px",transform:`rotate(${r}deg)`});
+  set(a.left+a.width/2,a.top+a.height/2-10,aw,ah,fromRot);
+  f.style.setProperty("--cw",aw+"px");
+  document.body.appendChild(f);f.getBoundingClientRect();
+  if(instant) f.style.transitionDuration=".45s";
+  set(b.left+b.width/2,b.top+b.height/2,bw,bh,toRot);
+  f.style.setProperty("--cw",bw+"px");
+  let ended=false;const end=()=>{if(ended)return;ended=true;f.remove();done()};
+  f.addEventListener("transitionend",e=>{if(e.propertyName==="left")end()});
+  setTimeout(end,instant?700:1000);
+}
+$("#table").addEventListener("click",e=>{
+  const fc=e.target.closest(".fcard");if(fc){pick(+fc.dataset.k);return}
+  if(e.target.closest("#autoRest")){autoRest();return}
+  const b=e.target.closest(".card");if(b) flip(+b.dataset.i);
+});
+function autoRest(){
+  const R=state.reading;if(!R||R.complete)return;
+  const free=[...document.querySelectorAll(".fcard:not(.taken)")].map(el=>+el.dataset.k);
+  const need=R.n-R.placed,step=need>12?35:110;
+  free.slice(0,need).forEach((k,j)=>setTimeout(()=>pick(k,need>12),j*step));
+}
+
+/* ---------- 뒤집기 ---------- */
+function flip(i){
+  const R=state.reading;if(!R||!R.cards[i]||R.open[i])return;
+  R.open[i]=true;
+  const btn=document.querySelector(`.card[data-i="${i}"]`);
+  if(btn){
+    btn.classList.add("open");
+    btn.setAttribute("aria-label",`${labelOf(curSpread().pos[i],i)} 자리, ${nameOf(BYID[R.cards[i].id],R.cards[i].rev)}`);
+    if(!RM()){setTimeout(()=>{btn.classList.add("reveal");dust(btn);setTimeout(()=>btn.classList.remove("reveal"),1300)},330)}
+  }
+  renderResults();updateButtons();
+}
+function dust(el){
+  const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  const n=Math.max(8,Math.min(16,Math.round(r.width/7)));
+  for(let j=0;j<n;j++){
+    const d=document.createElement("span");d.className="dust";
+    d.style.left=cx+"px";d.style.top=cy+"px";document.body.appendChild(d);
+    const ang=Math.random()*Math.PI*2,dist=r.width*(.45+Math.random()*.55);
+    const anim=d.animate([{transform:"translate(-50%,-50%) scale(1)",opacity:1},{transform:`translate(calc(-50% + ${Math.cos(ang)*dist}px),calc(-50% + ${Math.sin(ang)*dist-10}px)) scale(.2)`,opacity:0}],{duration:800+Math.random()*500,easing:"cubic-bezier(.2,.7,.3,1)"});
+    anim.onfinish=()=>d.remove();
+  }
+}
+$("#flipAllBtn").addEventListener("click",()=>{const R=state.reading;if(!R)return;let j=0;R.open.forEach((o,i)=>{if(!o&&R.cards[i])setTimeout(()=>flip(i),(j++)*(R.n>12?60:180))})});
+$("#drawBtn").addEventListener("click",start);
+
+/* ---------- 결과 ---------- */
+function renderResults(){
+  const R=state.reading,box=$("#results");
+  if(!R){box.innerHTML='<p class="hint">아직 뽑은 카드가 없습니다.</p>';return}
+  const sp=curSpread();
+  if(!R.open.some(Boolean)){box.innerHTML=`<p class="hint">${R.placed?`${R.placed}장이 놓였습니다. `:""}카드를 뒤집으면 여기에 정리됩니다.</p>`;return}
+  box.innerHTML='<ol class="results">'+sp.pos.map((p,i)=>{
+    const pos=`<div class="r-pos">${labelOf(p,i)}</div>`,cd=R.cards[i];
+    if(!cd) return `<li>${pos}<div class="r-closed">아직 고르지 않음</div></li>`;
+    if(!R.open[i]) return `<li>${pos}<div class="r-closed">아직 뒤집지 않음</div></li>`;
+    const c=BYID[cd.id],kw=cd.rev&&c.rkw?c.rkw:c.kw;
+    return `<li>${pos}<div><span class="r-name">${c.title}</span>${cd.rev?'<span class="r-rev">역방향</span>':""}<span class="r-sub">${c.sub}</span></div><div class="r-kw">${kw}</div></li>`;
+  }).join("")+"</ol>";
+}
+function updateButtons(){
+  const R=state.reading;
+  $("#flipAllBtn").disabled=!R||R.cards.every((c,i)=>!c||R.open[i]);
+  $("#copyBtn").disabled=!R||!R.placed;
+}
+
+/* ---------- 복사 ---------- */
+function readingText(R){
+  const sp=spreadFor(R.deck,R.spread,R.cards.length);
+  const when=new Date(R.time).toLocaleString("ko-KR",{dateStyle:"medium",timeStyle:"short"});
+  const lines=[`[${DECKS[R.deck].name}] ${R.spreadName}, ${R.cards.length}장 (${when})`];
+  if(R.question) lines.push("질문: "+R.question);
+  R.cards.forEach((cd,i)=>{
+    const p=sp.pos[i]||{l:""};
+    if(!cd){lines.push(`${i+1}. ${p.l?p.l+": ":""}(미선택)`);return}
+    const c=BYID[cd.id];
+    let t=`${i+1}. ${p.l?p.l+": ":""}${c.title}${cd.rev?" (역방향)":""}`;
+    if(R.deck==="bel") t+=` / ${c.num!==""?c.num+"번 ":""}${c.sub}`; else t+=` / ${c.sub}`;
+    lines.push(t);
+  });
+  return lines.join("\n");
+}
+async function copyText(t){
+  try{await navigator.clipboard.writeText(t);return true}catch(e){
+    try{const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();const ok=document.execCommand("copy");ta.remove();return ok}catch(e2){return false}}
+}
+$("#copyBtn").addEventListener("click",async()=>{
+  if(!state.reading)return;
+  const ok=await copyText(readingText(state.reading));
+  status(ok?"결과를 복사했습니다. 뒤집지 않은 카드도 포함됩니다.":"이 브라우저에서는 복사가 막혀 있습니다. 아래 목록을 직접 선택해 복사하세요.");
+});
+let stT;function status(m){const s=$("#status");s.textContent=m;clearTimeout(stT);stT=setTimeout(()=>s.textContent="",5000)}
+
+/* ---------- 기록 ---------- */
+function renderHistory(){
+  $("#histEmpty").hidden=history.length>0;
+  $("#clearHist").hidden=history.length===0;
+  $("#history").innerHTML=history.map((h,k)=>{
+    const when=new Date(h.time).toLocaleString("ko-KR",{dateStyle:"short",timeStyle:"short"});
+    const names=h.cards.map(cd=>nameOf(BYID[cd.id],cd.rev)).join(", ");
+    return `<li><div class="h-meta">${when}, ${DECKS[h.deck].name} ${esc(h.spreadName||"")}</div>${h.question?`<div class="h-q">${esc(h.question)}</div>`:""}<div class="h-cards">${names}</div><button class="linkbtn" data-h="${k}">테이블에 다시 펼치기</button></li>`;
+  }).join("");
+}
+$("#history").addEventListener("click",e=>{
+  const b=e.target.closest("[data-h]");if(!b)return;
+  const h=history[+b.dataset.h];if(!h)return;
+  state.reading={...h,n:h.cards.length,pool:[],cards:h.cards.slice(),open:h.cards.map(()=>true),placed:h.cards.length,complete:true};
+  renderTable({deal:true});$("#table").scrollIntoView({behavior:RM()?"auto":"smooth",block:"start"});
+});
+$("#clearHist").addEventListener("click",()=>{history=[];saveHistory();renderHistory();status("기록을 지웠습니다.")});
+
+renderSpreadRow();updateDrawLabel();renderTable();renderHistory();
+if("serviceWorker" in navigator&&location.protocol.startsWith("http")){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+</script>
+</body></html>
