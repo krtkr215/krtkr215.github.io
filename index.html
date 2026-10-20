@@ -202,6 +202,118 @@ button{font:inherit;cursor:pointer;color:inherit}
 .dealt .slot{animation:deal .5s cubic-bezier(.2,.8,.3,1) both;animation-delay:calc(var(--d)*45ms)}
 @keyframes deal{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---- 모바일 공통 ---- */
+.table{overflow:hidden;overflow:clip}
+@media (max-width:700px),(pointer:coarse){
+  .seg span{padding:9px 15px}
+  .btn{min-height:44px}
+  .opt input{width:20px;height:20px}
+}
+.pickarea{transition:opacity .5s ease,max-height .7s ease;max-height:1200px}
+.pickarea.gone{opacity:0;max-height:0;overflow:hidden;pointer-events:none;margin:0;padding:0}
+.dock{position:relative}
+@media (max-width:700px),(pointer:coarse){
+  .dock{position:sticky;bottom:0;z-index:20;margin:14px -16px -24px;padding:4px 12px calc(14px + env(safe-area-inset-bottom,0px));
+    background:linear-gradient(to top,var(--velvet2) 72%,rgba(6,20,15,0));border-radius:0 0 16px 16px}
+}
+.dock .pickbar{margin:6px 0 0}
+
+/* ---- 리본(손가락용 고르기) ---- */
+.ribbon{--rw:78px;position:relative;display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:24px calc(50% - var(--rw)/2) 12px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.ribbon::-webkit-scrollbar{display:none}
+.rcard{flex:0 0 var(--rw);width:var(--rw);aspect-ratio:5/8;scroll-snap-align:center;padding:0;border:0;background:none;position:relative;--cw:var(--rw);
+  border-radius:calc(var(--rw)*.07);transform:scale(.86);opacity:.7;
+  transition:transform .25s ease,opacity .25s ease,flex-basis .3s ease,width .3s ease,margin .3s ease;-webkit-tap-highlight-color:transparent}
+.rcard .face{box-shadow:0 1px 0 rgba(0,0,0,.4),0 5px 12px rgba(0,0,0,.45)}
+.rcard.focus{transform:translateY(-14px) scale(1.08);opacity:1}
+.rcard.focus .face{box-shadow:0 0 0 2px rgba(241,221,162,.9),0 14px 26px rgba(0,0,0,.55)}
+.rcard.taken{flex-basis:0;width:0;margin-right:-10px;opacity:0;transform:scale(.4);pointer-events:none}
+.rcard:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.ribbon.enter .rcard{animation:rin .6s cubic-bezier(.2,.8,.3,1) both;animation-delay:calc(var(--e,0)*45ms)}
+@keyframes rin{from{opacity:0;transform:translateY(34px) scale(.8)}}
+.swipehint{text-align:center;font-size:.8rem;opacity:.7;margin:0 0 2px}
+.bigpick{display:block;width:100%;min-height:54px;margin-top:6px;border-radius:12px;border:1px solid rgba(241,221,162,.75);
+  background:linear-gradient(180deg,rgba(201,164,92,.32),rgba(201,164,92,.12));color:var(--gold-hi);font-size:1.05rem;font-weight:700;letter-spacing:.02em}
+.bigpick:active{transform:translateY(1px)}
+.bigpick:disabled{opacity:.45;cursor:default}
+.bigpick:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+
+/* ---- 주역 ---- */
+.iching{display:grid;gap:22px;justify-items:center;padding:4px 0 6px}
+.coins{display:flex;gap:18px;justify-content:center;min-height:86px;padding-top:6px;perspective:600px}
+.coin{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;position:relative;
+  background:radial-gradient(circle at 35% 30%,#F7E6AC,#C9A45C 45%,#7E6026 100%);
+  box-shadow:inset 0 0 0 3px rgba(126,96,38,.65),inset 0 0 0 7px rgba(247,230,172,.25),0 5px 12px rgba(0,0,0,.45)}
+.coin::before{content:"";width:15px;height:15px;background:var(--velvet);box-shadow:inset 0 0 0 2px rgba(126,96,38,.85)}
+.coin.back{background:radial-gradient(circle at 35% 30%,#E2D2A2,#A8894A 50%,#5F4820 100%)}
+.coin .v{position:absolute;bottom:-24px;left:0;right:0;text-align:center;font-family:var(--latin);font-weight:600;font-size:.9rem;color:var(--tableink)}
+.coin.idle{opacity:.35}
+.coin.spin{animation:toss .75s cubic-bezier(.3,.6,.3,1)}
+@keyframes toss{0%{transform:translateY(0) rotateX(0)}45%{transform:translateY(-42px) rotateX(560deg)}100%{transform:translateY(0) rotateX(1080deg)}}
+.stalks{display:flex;gap:5px;align-items:flex-end;height:70px}
+.stalks i{display:block;width:3px;height:60px;border-radius:2px;background:var(--foil);opacity:.8}
+.stalks.spin i{animation:sway .8s ease-in-out both;animation-delay:calc(var(--s)*25ms)}
+@keyframes sway{0%,100%{transform:none}50%{transform:translateY(-10px) rotate(var(--a))}}
+.castmsg{text-align:center;font-size:.95rem;min-height:1.6em}
+.hexbuild{display:grid;gap:12px;width:min(340px,100%)}
+.yrow{display:grid;grid-template-columns:3.4em 1fr 4.4em;align-items:center;gap:12px;min-height:20px}
+.yrow .pn{font-size:.82rem;opacity:.75;text-align:right}
+.yrow .vl{font-size:.82rem;opacity:.85}
+.yrow.chg .vl{color:var(--gold-hi);opacity:1}
+.yrow.next .pn{color:var(--gold-hi);opacity:1}
+.yao{display:flex;gap:16%;height:16px}
+.yao span{flex:1;border-radius:2px;background:var(--foil);box-shadow:0 1px 0 rgba(0,0,0,.45)}
+.yao.yang span+span{display:none}
+.yao.empty{gap:0}
+.yao.empty span{background:none;box-shadow:none;border:1px dashed rgba(201,164,92,.35)}
+.yao.empty span+span{display:none}
+.yrow.next .yao.empty span{border-color:rgba(241,221,162,.8)}
+.yao.new{animation:grow .55s ease-out both;transform-origin:center}
+@keyframes grow{from{transform:scaleX(.05);opacity:0}to{transform:none;opacity:1}}
+.hexcards{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;width:100%}
+.hexcard{width:min(210px,calc(50% - 22px));border-radius:10px;padding:16px 12px 14px;text-align:center;color:var(--paperink);position:relative;
+  background:radial-gradient(ellipse at 50% 30%,#FFFBF1,var(--paper) 70%);
+  box-shadow:inset 0 0 0 4px var(--paper),inset 0 0 0 5px #B8913F,inset 0 0 0 7px var(--paper),inset 0 0 0 8px #B8913F,0 8px 18px rgba(0,0,0,.45)}
+.hexcard.show{animation:rise .8s cubic-bezier(.2,.8,.3,1) both}
+.hexcard.show+.arrow+.hexcard.show{animation-delay:.25s}
+@keyframes rise{from{opacity:0;transform:translateY(16px) scale(.96)}}
+.hexcard .tag{font-size:.75rem;letter-spacing:.12em;color:var(--verm)}
+.hexcard .mini{display:grid;gap:6px;width:62%;margin:10px auto 12px}
+.mini .yao{height:9px}
+.mini .yao span{background:#2A2320;box-shadow:none}
+.mini .yao.chg span{background:var(--verm)}
+.hexcard .hh{font-size:1.9rem;line-height:1.1;font-weight:700}
+.hexcard .hn{font-size:1.05rem;font-weight:700;margin-top:4px;word-break:keep-all}
+.hexcard .hm{font-family:var(--latin);font-size:.85rem;opacity:.7}
+.hexcard .ht{font-size:.78rem;opacity:.75;margin-top:4px}
+.hexcard .hk{font-size:.85rem;margin-top:6px;word-break:keep-all}
+.arrow{color:var(--gold-hi);font-size:1.3rem}
+.nochg{font-size:.9rem;opacity:.85;text-align:center}
+.castdock{width:100%;max-width:420px}
+.hexcards{flex-wrap:nowrap;gap:8px}
+.arrow{flex:none}
+.hexcard{width:min(210px,calc(50% - 16px))}
+@media (max-width:440px){.hexcard{padding:13px 8px 12px}.hexcard .hh{font-size:1.6rem}.hexcard .hn{font-size:.95rem}.hexcard .ht{font-size:.72rem}.hexcard .hk{font-size:.8rem}}
+/* ---- 괘 카드 ---- */
+.b-gua{--bk:#2A1B10}
+.gmini{display:grid;gap:calc(var(--cw)*.045);width:calc(var(--cw)*.5)}
+.gmini .yao{height:calc(var(--cw)*.05);gap:18%}
+.gmini .yao span{background:#2A2320;box-shadow:none;border-radius:1px}
+.gh{font-size:calc(var(--cw)*.2);font-weight:700;line-height:1.1;margin-bottom:2px}
+.f-gua .glyph{align-content:end;padding-bottom:calc(var(--cw)*.06)}
+.guares{margin-top:22px}
+.yaocards{--cw:58px;display:grid;grid-template-columns:repeat(6,var(--cw));gap:12px;justify-content:center}
+@media (max-width:520px){.yaocards{--cw:64px;grid-template-columns:repeat(3,var(--cw));gap:14px 18px}}
+.ycard{width:var(--cw);aspect-ratio:5/8;padding:0;border:0;background:none;position:relative;border-radius:calc(var(--cw)*.07);transition:transform .3s ease,opacity .4s ease}
+.ycard:hover:not(:disabled){transform:translateY(-6px)}
+.ycard:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.ycard.chosen{transform:translateY(-10px) scale(1.08)}
+.ycard.chosen .face{box-shadow:0 0 0 2px rgba(241,221,162,.9),0 0 26px rgba(241,221,162,.45)}
+.ycard.dim{opacity:.25}
+.ycard:disabled{cursor:default}
+.size-xl{--cw:clamp(118px,34vw,168px)}
 </style>
 </head>
 <body>
@@ -215,7 +327,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 <div class="wrap">
   <header>
     <h1>점사 카드 뽑기</h1>
-    <p>타로 78장, 르노르망 36장, 호로스코프 벨린 53장. 덱을 섞어 테이블에 펼친 뒤, 뒷면을 보고 끌리는 카드를 직접 골라 배열에 놓습니다.</p>
+    <p>타로 78장, 르노르망 36장, 호로스코프 벨린 53장, 그리고 주역 64괘. 카드는 섞어 펼친 뒤 뒷면을 보고 직접 고르고, 주역은 동전이나 시초법으로 여섯 효를 얻어 괘를 세웁니다.</p>
   </header>
 
   <section class="controls" aria-label="뽑기 설정">
@@ -224,14 +336,15 @@ button{font:inherit;cursor:pointer;color:inherit}
       <label class="seg"><input type="radio" name="deck" value="tarot" checked><span>타로<small>78</small></span></label>
       <label class="seg"><input type="radio" name="deck" value="len"><span>르노르망<small>36</small></span></label>
       <label class="seg"><input type="radio" name="deck" value="bel"><span>호로스코프 벨린<small>53</small></span></label>
+      <label class="seg"><input type="radio" name="deck" value="iching"><span>주역<small>64괘</small></span></label>
     </div>
     <div class="row" role="radiogroup" aria-label="배열" id="spreadRow"></div>
     <div class="row" role="radiogroup" aria-label="뽑는 방식">
       <span class="row-label">방식</span>
-      <label class="seg"><input type="radio" name="mode" value="pick" checked><span>직접 고르기</span></label>
-      <label class="seg"><input type="radio" name="mode" value="auto"><span>자동으로 뽑기</span></label>
+      <label class="seg"><input type="radio" name="mode" value="pick" checked><span id="modeA">직접 고르기</span></label>
+      <label class="seg"><input type="radio" name="mode" value="auto"><span id="modeB">자동으로 뽑기</span></label>
     </div>
-    <div class="row">
+    <div class="row" id="optRow">
       <span class="row-label">옵션</span>
       <label class="opt" id="optRev"><input type="checkbox" id="rev" checked> 역방향 포함</label>
       <label class="opt" id="optBlue" hidden><input type="checkbox" id="blue" checked> 블루 카드 포함</label>
@@ -253,7 +366,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 
   <div class="below">
     <section class="panel" aria-labelledby="resH">
-      <h2 id="resH">뽑힌 카드</h2>
+      <h2 id="resH">결과</h2>
       <div id="results"><p class="hint">아직 뽑은 카드가 없습니다.</p></div>
     </section>
     <section class="panel" aria-labelledby="histH">
@@ -355,14 +468,73 @@ function spreadFor(deck,id,n){
 }
 
 
+
+/* ---------- 주역 64괘 ---------- */
+const TRI=[
+ {k:"111",ko:"건",img:"천",h:"天",sym:"☰"},{k:"100",ko:"진",img:"뢰",h:"雷",sym:"☳"},
+ {k:"010",ko:"감",img:"수",h:"水",sym:"☵"},{k:"001",ko:"간",img:"산",h:"山",sym:"☶"},
+ {k:"000",ko:"곤",img:"지",h:"地",sym:"☷"},{k:"011",ko:"손",img:"풍",h:"風",sym:"☴"},
+ {k:"101",ko:"리",img:"화",h:"火",sym:"☲"},{k:"110",ko:"태",img:"택",h:"澤",sym:"☱"}];
+// 행: 상괘, 열: 하괘 (건 진 감 간 곤 손 리 태 순)
+const KWT=[[1,25,6,33,12,44,13,10],[34,51,40,62,16,32,55,54],[5,3,29,39,8,48,63,60],[26,27,4,52,23,18,22,41],
+ [11,24,7,15,2,46,36,19],[9,42,59,53,20,57,37,61],[14,21,64,56,35,50,30,38],[43,17,47,31,45,28,49,58]];
+const GUA=[
+["乾","건","강건함, 창조, 시작의 힘"],["坤","곤","순응, 포용, 받쳐 줌"],["屯","둔","시작의 어려움, 산고"],["蒙","몽","몽매함, 배움과 가르침"],
+["需","수","기다림, 때를 봄"],["訟","송","다툼, 시비"],["師","사","무리를 이끎, 규율"],["比","비","가까이함, 화합"],
+["小畜","소축","작게 쌓음, 잠시 멈춤"],["履","리","조심스러운 실천"],["泰","태","소통, 태평"],["否","비","막힘, 불통"],
+["同人","동인","뜻을 같이함, 협력"],["大有","대유","크게 가짐, 풍성함"],["謙","겸","겸손"],["豫","예","즐거움, 미리 준비함"],
+["隨","수","따름, 흐름을 좇음"],["蠱","고","묵은 폐단의 수습"],["臨","림","다가감, 임함"],["觀","관","살핌, 관조"],
+["噬嗑","서합","씹어 끊음, 장애 제거"],["賁","비","꾸밈, 장식"],["剝","박","깎여 나감, 쇠퇴"],["復","복","돌아옴, 회복"],
+["无妄","무망","거짓 없음, 자연스러움"],["大畜","대축","크게 쌓음, 축적"],["頤","이","기름, 양육과 말조심"],["大過","대과","크게 지나침, 과부하"],
+["坎","감","거듭된 험난함"],["離","리","붙음, 밝음"],["咸","함","감응, 끌림"],["恆","항","한결같음, 지속"],
+["遯","돈","물러남, 피함"],["大壯","대장","큰 기세, 왕성함"],["晉","진","나아감, 승진"],["明夷","명이","밝음이 다침, 빛을 감춤"],
+["家人","가인","가정, 집안의 도리"],["睽","규","어긋남, 반목"],["蹇","건","절름거림, 난관"],["解","해","풀림, 해소"],
+["損","손","덜어냄, 덜어서 얻음"],["益","익","더함, 이익"],["夬","쾌","결단, 척결"],["姤","구","우연한 만남"],
+["萃","췌","모임, 결집"],["升","승","오름, 상승"],["困","곤","곤궁함, 막다름"],["井","정","우물, 공동의 원천"],
+["革","혁","변혁, 혁신"],["鼎","정","솥, 새 질서 세움"],["震","진","진동, 놀람"],["艮","간","그침, 멈춤"],
+["漸","점","점진적으로 나아감"],["歸妹","귀매","시집가는 누이, 순서가 어긋남"],["豐","풍","풍성함, 절정"],["旅","려","나그네, 떠돎"],
+["巽","손","들어감, 유순함"],["兌","태","기쁨, 즐거운 교류"],["渙","환","흩어짐, 풀어 헤침"],["節","절","절제, 마디"],
+["中孚","중부","속에서 우러난 믿음"],["小過","소과","조금 지나침, 신중함"],["旣濟","기제","이미 건넘, 완성 뒤의 경계"],["未濟","미제","아직 건너지 못함, 미완"]];
+const HEX={};
+TRI.forEach((u,ui)=>TRI.forEach((l,li)=>{
+  const n=KWT[ui][li],g=GUA[n-1];
+  HEX[n]={num:n,up:u,lo:l,hanja:g[0],name:g[1],kw:g[2],full:(u===l?"중"+u.img:(u.img==="뢰"?"뇌":u.img)+l.img)+g[1]};
+}));
+const isYang=v=>v===7||v===9, isChg=v=>v===6||v===9;
+function hexOf(bits){
+  const lo=bits.slice(0,3).join(""),up=bits.slice(3,6).join("");
+  return HEX[KWT[TRI.findIndex(t=>t.k===up)][TRI.findIndex(t=>t.k===lo)]];
+}
+const benGua=lines=>hexOf(lines.map(v=>isYang(v)?1:0));
+const zhiGua=lines=>hexOf(lines.map(v=>v===9?0:v===6?1:isYang(v)?1:0));
+const YPOS=["초","이","삼","사","오","상"];
+function yaoName(i,v){const y=isYang(v)?"구":"육";return i===0?"초"+y:i===5?"상"+y:y+YPOS[i]}
+const VNAME={6:"노음",7:"소양",8:"소음",9:"노양"};
+function castValue(method){
+  if(method==="yarrow"){const r=rint(16);return {v:r<1?6:r<6?7:r<13?8:9,coins:null}}
+  const coins=[0,0,0].map(()=>rint(2)?3:2);
+  return {v:coins.reduce((a,b)=>a+b,0),coins};
+}
+
+const GUA_CARDS=Object.values(HEX).sort((a,b)=>a.num-b.num).map(h=>({id:"G"+h.num,num:h.num,title:h.full,sub:h.hanja,kw:h.kw,hx:h,bits:(h.lo.k+h.up.k).split("").map(Number)}));
+const guaLines=(c,m)=>c.bits.map((b,i)=>i===m?(b?9:6):(b?7:8));
+
 /* ---------- 상태 ---------- */
 const $=s=>document.querySelector(s);
 const RM=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
-const state={deck:"tarot",spread:"three",mode:"pick",reading:null};
+const useRibbon=()=>matchMedia("(max-width:700px), (pointer:coarse)").matches;
+const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}};
+DECKS.iching={name:"주역",cards:[]};
+DECKS.gua={name:"주역",cards:GUA_CARDS};GUA_CARDS.forEach(c=>BYID[c.id]=c);
+SPREADS.gua=[{id:"one",name:"괘 카드",pos:[{l:"본괘"}]}];
+const state={deck:"tarot",spread:"three",mode:"pick",method:"card",reading:null};
 const HKEY="card-draw-history-v1";
 let history=[];
-try{history=JSON.parse(localStorage.getItem(HKEY)||"[]");if(!Array.isArray(history))history=[];history=history.filter(h=>h&&Array.isArray(h.cards)&&h.cards.every(cd=>cd&&BYID[cd.id]))}catch(e){history=[]}
+const validHist=h=>h&&(h.deck==="iching"?Array.isArray(h.lines)&&h.lines.length===6:Array.isArray(h.cards)&&h.cards.every(cd=>cd&&BYID[cd.id]));
+try{history=JSON.parse(localStorage.getItem(HKEY)||"[]");if(!Array.isArray(history))history=[];history=history.filter(validHist)}catch(e){history=[]}
 function saveHistory(){try{localStorage.setItem(HKEY,JSON.stringify(history.slice(0,30)))}catch(e){}}
+function pushHistory(h){history.unshift(h);history=history.slice(0,30);saveHistory();renderHistory()}
+const fmtTime=(t,short)=>new Date(t).toLocaleString("ko-KR",{dateStyle:short?"short":"medium",timeStyle:"short"});
 
 /* ---------- 카드 뒷면 ---------- */
 const BACKSVG=`<svg viewBox="0 0 100 160" aria-hidden="true">
@@ -382,48 +554,67 @@ const backFace=deck=>`<span class="face back b-${deck}" aria-hidden="true">${BAC
 /* ---------- 설정 UI ---------- */
 function poolSize(){return DECKS[state.deck].cards.length+(state.deck==="bel"&&$("#blue").checked?1:0)}
 function renderSpreadRow(){
-  const list=SPREADS[state.deck];
-  if(!list.find(s=>s.id===state.spread)) state.spread="three";
-  $("#spreadRow").innerHTML='<span class="row-label">배열</span>'+list.map(s=>
-    `<label class="seg"><input type="radio" name="spread" value="${s.id}"${s.id===state.spread?" checked":""}><span>${s.name}${s.pos&&s.pos.length>1?`<small>${s.pos.length}</small>`:""}</span></label>`).join("");
+  const row=$("#spreadRow"),ic=state.deck==="iching";
+  if(ic){
+    row.setAttribute("aria-label","점법");
+    row.innerHTML='<span class="row-label">점법</span>'+[["card","괘 카드"],["coin","동전 세 개"],["yarrow","시초법 확률"]].map(([v,t])=>
+      `<label class="seg"><input type="radio" name="method" value="${v}"${state.method===v?" checked":""}><span>${t}</span></label>`).join("");
+  }else{
+    row.setAttribute("aria-label","배열");
+    const list=SPREADS[state.deck];
+    if(!list.find(s=>s.id===state.spread)) state.spread="three";
+    row.innerHTML='<span class="row-label">배열</span>'+list.map(s=>
+      `<label class="seg"><input type="radio" name="spread" value="${s.id}"${s.id===state.spread?" checked":""}><span>${s.name}${s.pos&&s.pos.length>1?`<small>${s.pos.length}</small>`:""}</span></label>`).join("");
+  }
+  $("#optRow").hidden=ic||(state.deck==="len"&&state.spread!=="custom");
   $("#optRev").hidden=state.deck!=="tarot";
   $("#optBlue").hidden=state.deck!=="bel";
-  $("#optCount").hidden=state.spread!=="custom";
-  $("#count").max=poolSize();
+  $("#optCount").hidden=ic||state.spread!=="custom";
+  if(!ic) $("#count").max=poolSize();
+  const toss=ic&&state.method!=="card";
+  $("#modeA").textContent=toss?"한 효씩 던지기":"직접 고르기";
+  $("#modeB").textContent=toss?"여섯 효 한 번에":"자동으로 뽑기";
+  updateDrawLabel();
 }
-function updateDrawLabel(){$("#drawBtn").textContent=state.mode==="pick"?"섞어서 펼치기":"섞고 뽑기"}
+function updateDrawLabel(){
+  $("#drawBtn").textContent=state.deck==="iching"&&state.method!=="card"?"점치기 시작":state.mode==="pick"?"섞어서 펼치기":"섞고 뽑기";
+}
 document.querySelectorAll('input[name=deck]').forEach(r=>r.addEventListener("change",e=>{state.deck=e.target.value;renderSpreadRow()}));
 document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener("change",e=>{state.mode=e.target.value;updateDrawLabel()}));
-$("#spreadRow").addEventListener("change",e=>{if(e.target.name==="spread"){state.spread=e.target.value;$("#optCount").hidden=state.spread!=="custom"}});
+$("#spreadRow").addEventListener("change",e=>{
+  if(e.target.name==="spread"){state.spread=e.target.value;renderSpreadRow()}
+  if(e.target.name==="method"){state.method=e.target.value;renderSpreadRow()}
+});
 $("#blue").addEventListener("change",()=>{$("#count").max=poolSize()});
 
 /* ---------- 시작 ---------- */
 function start(){
-  const deck=state.deck;
+  if(state.deck==="iching"&&state.method!=="card"){startIching();return}
+  const deck=state.deck==="iching"?"gua":state.deck;
+  const spreadId=deck==="gua"?"one":state.spread;
   const cards=DECKS[deck].cards.slice();
   if(deck==="bel"&&$("#blue").checked) cards.push(BLUE);
   let n;
-  if(state.spread==="custom"){n=Math.max(1,Math.min(cards.length,parseInt($("#count").value,10)||1));$("#count").value=n}
-  else n=SPREADS[deck].find(s=>s.id===state.spread).pos.length;
+  if(spreadId==="custom"){n=Math.max(1,Math.min(cards.length,parseInt($("#count").value,10)||1));$("#count").value=n}
+  else n=SPREADS[deck].find(s=>s.id===spreadId).pos.length;
   const useRev=deck==="tarot"&&$("#rev").checked;
   const pool=shuffle(cards).map(c=>({id:c.id,rev:useRev?rint(2)===1:false}));
-  const sp=spreadFor(deck,state.spread,n);
-  const R={deck,spread:state.spread,spreadName:sp.name,question:$("#question").value.trim(),time:Date.now(),n,
-    pool,cards:new Array(n).fill(null),open:new Array(n).fill(false),placed:0,complete:false,mode:state.mode};
+  const sp=spreadFor(deck,spreadId,n);
+  const R={deck,spread:spreadId,moving:null,spreadName:sp.name,question:$("#question").value.trim(),time:Date.now(),n,
+    pool,cards:new Array(n).fill(null),open:new Array(n).fill(false),placed:0,complete:false};
   state.reading=R;
   if(state.mode==="auto"){
-    R.cards=pool.slice(0,n);R.placed=n;finish(false);
+    R.cards=pool.slice(0,n);R.placed=n;finishCards();
     renderTable({deal:true});
     status(`${DECKS[deck].name} ${n}장을 뽑았습니다. 카드를 눌러 뒤집으세요.`);
   }else{
-    renderTable({fan:true});
-    status(`덱을 섞어 펼쳤습니다. ${n}장을 골라 주세요.`);
+    renderTable({pick:true});
+    status(useRibbon()?`덱을 섞었습니다. 좌우로 넘기며 ${n}장을 골라 주세요.`:`덱을 섞어 펼쳤습니다. ${n}장을 골라 주세요.`);
   }
 }
-function finish(save=true){
+function finishCards(){
   const R=state.reading;R.complete=true;
-  history.unshift({deck:R.deck,spread:R.spread,spreadName:R.spreadName,question:R.question,time:R.time,cards:R.cards});
-  history=history.slice(0,30);saveHistory();renderHistory();
+  pushHistory({deck:R.deck,spread:R.spread,spreadName:R.spreadName,question:R.question,time:R.time,cards:R.cards,moving:R.moving});
 }
 
 /* ---------- 카드 앞면 ---------- */
@@ -431,6 +622,10 @@ function frontHTML(deck,c,rev){
   if(deck==="tarot"){
     const g=c.kind==="major"?`<span class="roman">${c.num}</span>`:`<span class="suit s-${c.suit}">${SUITSVG[c.suit]}</span>`;
     return `<span class="face front f-tarot${rev?" rev":""}" aria-hidden="true"><span class="fc">${c.kind==="minor"?`<span class="cn">${c.num}</span>`:""}<span class="glyph">${g}</span><span class="ct">${c.title}</span><span class="cs">${c.sub}</span></span></span>`;
+  }
+  if(deck==="gua"){
+    const mini=[...c.bits].reverse().map(b=>`<span class="yao ${b?"yang":"yin"}"><span></span><span></span></span>`).join("");
+    return `<span class="face front f-gua" aria-hidden="true"><span class="fc"><span class="cn">${c.num}</span><span class="glyph"><span class="gmini">${mini}</span></span><span class="gh">${c.sub}</span><span class="ct">${c.title}</span><span class="cs">${c.kw.split(",")[0]}</span></span></span>`;
   }
   if(deck==="len"){
     const red=/[♥♦]/.test(c.sub);
@@ -443,6 +638,10 @@ const nameOf=(c,rev)=>c.title+(rev?" (역방향)":"");
 
 /* ---------- 테이블 ---------- */
 function curSpread(){const R=state.reading;return spreadFor(R.deck,R.spread,R.n)}
+function headHTML(title){
+  const R=state.reading;
+  return `<div class="table-head"><span class="deckname">${title}</span><span>${R.question?`<span class="q">“${esc(R.question)}”</span> `:""}<span style="opacity:.65">${fmtTime(R.time)}</span></span></div>`;
+}
 function hostHTML(i){
   const R=state.reading,cd=R.cards[i],p=curSpread().pos[i];
   if(!cd) return `<span class="ph${i===R.placed&&!R.complete?" next":""}">${i+1}</span>`;
@@ -451,26 +650,31 @@ function hostHTML(i){
 }
 function renderTable(opt={}){
   const R=state.reading,table=$("#table");
-  if(!R){table.innerHTML='<p class="empty">덱과 배열을 고르고 섞어서 펼치기를 누르세요. 펼쳐진 카드 뒷면 가운데 끌리는 카드를 골라 배열에 놓을 수 있습니다.</p>';renderResults();updateButtons();return}
+  if(!R){table.innerHTML='<p class="empty">덱과 배열을 고르고 시작하세요. 카드는 펼쳐진 뒷면 가운데 끌리는 카드를 직접 고를 수 있고, 주역은 동전을 던져 괘를 세웁니다.</p>';renderResults();updateButtons();return}
+  if(R.deck==="iching"){renderIching(opt);return}
   const sp=curSpread(),n=R.n;
-  const size=sp.small||n>=20?"s":(sp.cols||n>5?"m":"l");
+  const size=sp.small||n>=20?"s":n===1?"xl":(sp.cols||n>5?"m":"l");
   const hasCross=sp.pos.some(p=>p.x);
   const slots=sp.pos.map((p,i)=>{
     let lab=labelOf(p,i);
     if(hasCross&&i===0){const xi=sp.pos.findIndex(q=>q.x);lab+=`<br>${labelOf(sp.pos[xi],xi)}`}
     return `<div class="slot${p.x?" cross":""}" style="--d:${i};${p.c?`grid-column:${p.c};grid-row:${p.r};`:""}"><div class="host" data-host="${i}">${hostHTML(i)}</div><span class="lab">${lab}</span></div>`;
   }).join("");
-  const when=new Date(R.time).toLocaleString("ko-KR",{dateStyle:"medium",timeStyle:"short"});
-  const showFan=opt.fan&&!R.complete;
-  table.innerHTML=`<div class="table-head"><span class="deckname">${DECKS[R.deck].name}, ${esc(R.spreadName)} (${n}장)</span><span>${R.question?`<span class="q">“${esc(R.question)}”</span> `:""}<span style="opacity:.65">${when}</span></span></div>
-  <div class="spread-scroll"><div class="spread ${sp.cols?"grid":"flow"} size-${size}${hasCross?" has-cross":""}${opt.deal?" dealt":""}" style="${sp.cols?`--cols:${sp.cols}`:""}">${slots}</div></div>
-  ${showFan?`<div class="fanwrap" id="fanwrap"><div class="pickbar"><span>남은 선택 <b id="left">${n-R.placed}</b> 장</span><button class="ghost" id="autoRest">나머지 자동으로 채우기</button></div><div class="fan" id="fan">${R.pool.map((_,k)=>`<button class="fcard" data-k="${k}" aria-label="펼쳐진 덱의 ${k+1}번째 카드 고르기">${backFace(R.deck)}</button>`).join("")}</div></div>`:""}`;
-  if(showFan) spreadFan();
+  const showPick=opt.pick&&!R.complete,rib=useRibbon();
+  let pickHTML="";
+  if(showPick){
+    const bar=`<div class="pickbar"><span>남은 선택 <b id="left">${n-R.placed}</b>장</span><button class="ghost" id="autoRest">나머지 자동으로</button></div>`;
+    pickHTML=rib
+      ?`<div class="dock pickarea" id="pickarea">${bar}<div class="ribbon" id="ribbon">${R.pool.map((_,k)=>`<button class="rcard" data-k="${k}" aria-label="섞인 덱의 ${k+1}번째 카드">${backFace(R.deck)}</button>`).join("")}</div><p class="swipehint">좌우로 넘겨 보고, 가운데 카드를 고르세요</p><button class="bigpick" id="bigPick">가운데 카드 고르기</button></div>`
+      :`<div class="pickarea" id="pickarea">${bar}<div class="fan" id="fan">${R.pool.map((_,k)=>`<button class="fcard" data-k="${k}" aria-label="펼쳐진 덱의 ${k+1}번째 카드 고르기">${backFace(R.deck)}</button>`).join("")}</div></div>`;
+  }
+  const ttl=R.deck==="gua"?"주역, 괘 카드":`${DECKS[R.deck].name}, ${esc(R.spreadName)} (${n}장)`;
+  table.innerHTML=`${headHTML(ttl)}
+  <div class="spread-scroll"><div class="spread ${sp.cols?"grid":"flow"} size-${size}${hasCross?" has-cross":""}${opt.deal?" dealt":""}" style="${sp.cols?`--cols:${sp.cols}`:""}">${slots}</div></div>${R.deck==="gua"?`<div id="guaextra">${guaExtraHTML()}</div>`:""}${pickHTML}`;
+  if(showPick){rib?setupRibbon():spreadFan()}
   renderResults();updateButtons();
 }
-function setHost(i){
-  const h=document.querySelector(`[data-host="${i}"]`);if(h) h.innerHTML=hostHTML(i);
-}
+function setHost(i){const h=document.querySelector(`[data-host="${i}"]`);if(h) h.innerHTML=hostHTML(i)}
 function markNext(){
   const R=state.reading;
   document.querySelectorAll(".ph.next").forEach(e=>e.classList.remove("next"));
@@ -478,7 +682,7 @@ function markNext(){
   const ph=document.querySelector(`[data-host="${R.placed}"] .ph`);if(ph) ph.classList.add("next");
 }
 
-/* ---------- 부채꼴 펼치기 ---------- */
+/* ---------- PC: 부채꼴 ---------- */
 function layoutFan(){
   const fan=$("#fan");if(!fan)return;
   const cards=[...fan.querySelectorAll(".fcard")],N=cards.length;if(!N)return;
@@ -491,60 +695,72 @@ function layoutFan(){
     const r=Math.floor(k/per),i=k%per,cnt=Math.min(per,N-r*per);
     const t=cnt>1?i/(cnt-1):.5;
     const span=Math.min(W-fw*1.9,(cnt-1)*fw*.85);
-    const x=(W-fw)/2-span/2+t*span;
-    const arc=Math.min(36,cnt*.9);
-    const y=26+r*rowGap+Math.pow((t-.5)*2,2)*sag;
+    const x=(W-fw)/2-span/2+t*span,arc=Math.min(36,cnt*.9),y=26+r*rowGap+Math.pow((t-.5)*2,2)*sag;
     el.style.setProperty("--x",x+"px");el.style.setProperty("--y",y+"px");el.style.setProperty("--r",((t-.5)*arc).toFixed(2)+"deg");
     el.style.zIndex=k;el.dataset.rot=((t-.5)*arc).toFixed(2);
   });
   fan.style.height=(26+(rows-1)*rowGap+fh+sag+16)+"px";
 }
 function spreadFan(){
-  const fan=$("#fan");
-  const cards=[...fan.querySelectorAll(".fcard")];
+  const fan=$("#fan"),cards=[...fan.querySelectorAll(".fcard")];
   layoutFan();
   if(RM()){fan.classList.add("ready");markNext();return}
   const W=fan.clientWidth,fw=cards[0].offsetWidth;
   const finals=cards.map(el=>[el.style.getPropertyValue("--x"),el.style.getPropertyValue("--y"),el.style.getPropertyValue("--r")]);
-  cards.forEach((el,k)=>{
-    el.style.transition="none";
-    el.style.setProperty("--x",((W-fw)/2+(k%3-1)*1.5)+"px");
-    el.style.setProperty("--y","30px");
-    el.style.setProperty("--r",((k%5)-2)*.8+"deg");
-  });
+  cards.forEach((el,k)=>{el.style.transition="none";el.style.setProperty("--x",((W-fw)/2+(k%3-1)*1.5)+"px");el.style.setProperty("--y","30px");el.style.setProperty("--r",((k%5)-2)*.8+"deg")});
   fan.getBoundingClientRect();
   requestAnimationFrame(()=>{
-    cards.forEach((el,k)=>{
-      el.style.transition="";el.style.transitionDelay=(120+k*9)+"ms";el.style.transitionDuration=".9s";
-      el.style.setProperty("--x",finals[k][0]);el.style.setProperty("--y",finals[k][1]);el.style.setProperty("--r",finals[k][2]);
-    });
+    cards.forEach((el,k)=>{el.style.transition="";el.style.transitionDelay=(120+k*9)+"ms";el.style.transitionDuration=".9s";
+      el.style.setProperty("--x",finals[k][0]);el.style.setProperty("--y",finals[k][1]);el.style.setProperty("--r",finals[k][2])});
     setTimeout(()=>{cards.forEach(el=>{el.style.transitionDelay="";el.style.transitionDuration=""});fan.classList.add("ready")},1100+cards.length*9);
   });
   markNext();
 }
 let rsT;addEventListener("resize",()=>{clearTimeout(rsT);rsT=setTimeout(layoutFan,120)});
 
+/* ---------- 휴대폰: 리본 ---------- */
+function setupRibbon(){
+  const rb=$("#ribbon"),cards=[...rb.children],mid=Math.floor(cards.length/2);
+  const center=()=>{const c=cards[mid];rb.scrollLeft=c.offsetLeft+c.offsetWidth/2-rb.clientWidth/2;updateFocus()};
+  requestAnimationFrame(center);
+  if(!RM()){cards.forEach((c,k)=>c.style.setProperty("--e",Math.min(Math.abs(k-mid),8)));rb.classList.add("enter");setTimeout(()=>rb.classList.remove("enter"),1000)}
+  let raf=null;
+  rb.addEventListener("scroll",()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=null;updateFocus()})},{passive:true});
+  markNext();
+}
+function updateFocus(){
+  const rb=$("#ribbon");if(!rb)return;
+  const r=rb.getBoundingClientRect(),cx=r.left+r.width/2;
+  let best=null,bd=1e9;
+  rb.querySelectorAll(".rcard:not(.taken)").forEach(c=>{const b=c.getBoundingClientRect(),d=Math.abs(b.left+b.width/2-cx);if(d<bd){bd=d;best=c}});
+  rb.querySelectorAll(".rcard.focus").forEach(c=>{if(c!==best)c.classList.remove("focus")});
+  if(best&&!best.classList.contains("focus")){best.classList.add("focus")}
+}
+function focusedK(){const f=document.querySelector("#ribbon .rcard.focus");return f?+f.dataset.k:null}
+
 /* ---------- 고르기와 날아가기 ---------- */
-function pick(k,instant){
+function pick(k,quick){
   const R=state.reading;if(!R||R.complete||R.placed>=R.n)return;
-  const el=document.querySelector(`.fcard[data-k="${k}"]`);if(!el||el.classList.contains("taken"))return;
+  const el=document.querySelector(`#pickarea [data-k="${k}"]`);if(!el||el.classList.contains("taken"))return;
   const i=R.placed;
   R.cards[i]=R.pool[k];R.placed++;
+  buzz();
   const left=$("#left");if(left) left.textContent=R.n-R.placed;
   const host=document.querySelector(`[data-host="${i}"]`);
   const isCross=!!(curSpread().pos[i]||{}).x;
   const land=()=>{setHost(i);const c=host&&host.querySelector(".card");if(c&&!RM()){c.classList.add("reveal");setTimeout(()=>c.classList.remove("reveal"),1300)}renderResults();updateButtons()};
-  fly(el,host,R.deck,parseFloat(el.dataset.rot||0),isCross?90:0,isCross?.92:1,instant,land);
-  el.classList.add("taken");
+  fly(el,host,R.deck,parseFloat(el.dataset.rot||0),isCross?90:0,isCross?.92:1,quick,land);
+  el.classList.add("taken");el.classList.remove("focus");
+  if(el.classList.contains("rcard")) setTimeout(updateFocus,330);
   markNext();
   if(R.placed===R.n){
-    finish();
-    const fw=$("#fanwrap");if(fw){$("#fan").classList.add("locked");setTimeout(()=>fw.classList.add("gone"),450)}
+    finishCards();
+    const pa=$("#pickarea");if(pa){const f=$("#fan");if(f)f.classList.add("locked");setTimeout(()=>pa.classList.add("gone"),450)}
     status("배열이 완성되었습니다. 카드를 눌러 뒤집으세요.");
   }
 }
-function fly(fromEl,toEl,deck,fromRot,toRot,toScale,instant,done){
-  if(!toEl||RM()||instant==="none"){done();return}
+function fly(fromEl,toEl,deck,fromRot,toRot,toScale,quick,done){
+  if(!toEl||RM()){done();return}
   const a=fromEl.getBoundingClientRect(),b=toEl.getBoundingClientRect();
   const aw=fromEl.offsetWidth,ah=fromEl.offsetHeight,bw=toEl.offsetWidth*toScale,bh=toEl.offsetHeight*toScale;
   const f=document.createElement("div");f.className="flying";f.innerHTML=backFace(deck);
@@ -552,28 +768,38 @@ function fly(fromEl,toEl,deck,fromRot,toRot,toScale,instant,done){
   set(a.left+a.width/2,a.top+a.height/2-10,aw,ah,fromRot);
   f.style.setProperty("--cw",aw+"px");
   document.body.appendChild(f);f.getBoundingClientRect();
-  if(instant) f.style.transitionDuration=".45s";
+  if(quick) f.style.transitionDuration=".45s";
   set(b.left+b.width/2,b.top+b.height/2,bw,bh,toRot);
   f.style.setProperty("--cw",bw+"px");
   let ended=false;const end=()=>{if(ended)return;ended=true;f.remove();done()};
   f.addEventListener("transitionend",e=>{if(e.propertyName==="left")end()});
-  setTimeout(end,instant?700:1000);
+  setTimeout(end,quick?700:1000);
 }
-$("#table").addEventListener("click",e=>{
-  const fc=e.target.closest(".fcard");if(fc){pick(+fc.dataset.k);return}
-  if(e.target.closest("#autoRest")){autoRest();return}
-  const b=e.target.closest(".card");if(b) flip(+b.dataset.i);
-});
 function autoRest(){
   const R=state.reading;if(!R||R.complete)return;
-  const free=[...document.querySelectorAll(".fcard:not(.taken)")].map(el=>+el.dataset.k);
+  const free=[...document.querySelectorAll("#pickarea [data-k]:not(.taken)")].map(el=>+el.dataset.k);
   const need=R.n-R.placed,step=need>12?35:110;
   free.slice(0,need).forEach((k,j)=>setTimeout(()=>pick(k,need>12),j*step));
 }
+$("#table").addEventListener("click",e=>{
+  const fc=e.target.closest(".fcard");if(fc){pick(+fc.dataset.k);return}
+  const rc=e.target.closest(".rcard");
+  if(rc){
+    if(rc.classList.contains("focus")) pick(+rc.dataset.k);
+    else rc.scrollIntoView({behavior:RM()?"auto":"smooth",inline:"center",block:"nearest"});
+    return;
+  }
+  if(e.target.closest("#bigPick")){const k=focusedK();if(k!==null)pick(k);return}
+  if(e.target.closest("#autoRest")){autoRest();return}
+  if(e.target.closest("#castBtn")){castOne();return}
+  if(e.target.closest("#yaoStart")){const R=state.reading;R.yaoStage=true;R.yaoPool=shuffle([0,1,2,3,4,5]);renderGuaExtra();return}
+  const yc=e.target.closest(".ycard");if(yc){chooseYao(+yc.dataset.y);return}
+  const b=e.target.closest(".card");if(b) flip(+b.dataset.i);
+});
 
 /* ---------- 뒤집기 ---------- */
 function flip(i){
-  const R=state.reading;if(!R||!R.cards[i]||R.open[i])return;
+  const R=state.reading;if(!R||!R.cards||!R.cards[i]||R.open[i])return;
   R.open[i]=true;
   const btn=document.querySelector(`.card[data-i="${i}"]`);
   if(btn){
@@ -581,9 +807,41 @@ function flip(i){
     btn.setAttribute("aria-label",`${labelOf(curSpread().pos[i],i)} 자리, ${nameOf(BYID[R.cards[i].id],R.cards[i].rev)}`);
     if(!RM()){setTimeout(()=>{btn.classList.add("reveal");dust(btn);setTimeout(()=>btn.classList.remove("reveal"),1300)},330)}
   }
+  if(R.deck==="gua") setTimeout(renderGuaExtra,RM()?0:900);
   renderResults();updateButtons();
 }
+
+/* ---------- 괘 카드: 동효 ---------- */
+function guaExtraHTML(){
+  const R=state.reading;if(!R||R.deck!=="gua"||!R.open[0])return "";
+  const c=BYID[R.cards[0].id];
+  if(R.moving!=null){
+    const L=guaLines(c,R.moving),z=zhiGua(L),zl=L.map(v=>v===9?8:v===6?7:v);
+    return `<div class="iching guares"><p class="castmsg">동효: <b>${yaoName(R.moving,L[R.moving])}</b> (${YPOS[R.moving]}효가 변합니다)</p><div class="hexcards">${hexCardHTML("본괘",c.hx,L,true)}<span class="arrow" aria-hidden="true">→</span>${hexCardHTML("지괘",z,zl,false)}</div></div>`;
+  }
+  if(R.yaoStage){
+    return `<div class="iching guares"><p class="castmsg">여섯 장 가운데 한 장을 고르세요. 고른 카드의 자리가 동효가 됩니다.</p><div class="yaocards">${R.yaoPool.map((_,j)=>`<button class="ycard" data-y="${j}" aria-label="동효 카드 ${j+1}번 고르기">${backFace("gua")}</button>`).join("")}</div></div>`;
+  }
+  return `<div class="iching guares"><p class="castmsg">괘사만으로 읽어도 되고, 동효를 하나 더 뽑아 변화의 방향(지괘)까지 볼 수도 있습니다.</p><div class="dock castdock"><button class="bigpick" id="yaoStart">동효 뽑기</button></div></div>`;
+}
+function renderGuaExtra(){const g=$("#guaextra");if(g)g.innerHTML=guaExtraHTML()}
+function chooseYao(j){
+  const R=state.reading;if(!R||R.moving!=null||!R.yaoStage)return;
+  buzz();
+  R.moving=R.yaoPool[j];
+  const el=document.querySelector(`.ycard[data-y="${j}"]`);
+  document.querySelectorAll(".ycard").forEach(b=>{b.disabled=true;if(b!==el)b.classList.add("dim")});
+  if(el){el.classList.add("chosen");dust(el)}
+  const h=history.find(x=>x.deck==="gua"&&x.time===R.time);if(h){h.moving=R.moving;saveHistory();renderHistory()}
+  setTimeout(()=>{
+    renderGuaExtra();renderResults();
+    document.querySelectorAll("#guaextra .hexcard").forEach((c,k)=>setTimeout(()=>dust(c),k*250+300));
+    const L=guaLines(BYID[R.cards[0].id],R.moving);
+    status(`동효는 ${yaoName(R.moving,L[R.moving])}입니다.`);
+  },RM()?0:600);
+}
 function dust(el){
+  if(RM())return;
   const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
   const n=Math.max(8,Math.min(16,Math.round(r.width/7)));
   for(let j=0;j<n;j++){
@@ -594,13 +852,129 @@ function dust(el){
     anim.onfinish=()=>d.remove();
   }
 }
-$("#flipAllBtn").addEventListener("click",()=>{const R=state.reading;if(!R)return;let j=0;R.open.forEach((o,i)=>{if(!o&&R.cards[i])setTimeout(()=>flip(i),(j++)*(R.n>12?60:180))})});
+$("#flipAllBtn").addEventListener("click",()=>{const R=state.reading;if(!R||!R.cards)return;let j=0;R.open.forEach((o,i)=>{if(!o&&R.cards[i])setTimeout(()=>flip(i),(j++)*(R.n>12?60:180))})});
 $("#drawBtn").addEventListener("click",start);
+
+/* ---------- 주역 ---------- */
+const METHOD={coin:"동전 세 개",yarrow:"시초법 확률"};
+let casting=false;
+function startIching(){
+  const R={deck:"iching",method:state.method,question:$("#question").value.trim(),time:Date.now(),lines:[],coins:[],complete:false};
+  state.reading=R;casting=false;
+  renderTable();
+  if(state.mode==="auto"){autoCast()}
+  else status("초효(맨 아래 효)부터 차례로 여섯 번 던집니다.");
+}
+function autoCast(){
+  const step=()=>{if(state.reading.deck!=="iching"||state.reading.complete)return;castOne(()=>setTimeout(step,RM()?0:260))};
+  step();
+}
+function yaoHTML(v,cls=""){
+  if(v==null) return `<span class="yao empty ${cls}"><span></span><span></span></span>`;
+  return `<span class="yao ${isYang(v)?"yang":"yin"}${isChg(v)?" chg":""} ${cls}"><span></span><span></span></span>`;
+}
+function rowsHTML(newIdx){
+  const R=state.reading;let h="";
+  for(let i=5;i>=0;i--){
+    const v=R.lines[i];
+    const next=!R.complete&&i===R.lines.length;
+    const vl=v==null?"":`${v} ${VNAME[v]}${isChg(v)?(v===9?" ○":" ×"):""}`;
+    h+=`<div class="yrow${v!=null&&isChg(v)?" chg":""}${next?" next":""}"><span class="pn">${v!=null?yaoName(i,v):YPOS[i]+"효"}</span>${yaoHTML(v,i===newIdx?"new":"")}<span class="vl">${vl}</span></div>`;
+  }
+  return h;
+}
+function coinsHTML(coins,spin){
+  const R=state.reading;
+  if(R.method==="yarrow") return `<div class="stalks${spin?" spin":""}" aria-hidden="true">${Array.from({length:13},(_,j)=>`<i style="--s:${j};--a:${(j%2?1:-1)*(3+j%4)}deg"></i>`).join("")}</div>`;
+  const cs=coins||[null,null,null];
+  return `<div class="coins" aria-hidden="true">${cs.map(c=>`<span class="coin${c===2?" back":""}${c==null?" idle":""}${spin?" spin":""}">${c!=null?`<span class="v">${c}</span>`:""}</span>`).join("")}</div>`;
+}
+function hexCardHTML(tag,hx,lines,showChg){
+  const mini=[...Array(6)].map((_,j)=>{const i=5-j,v=lines[i];return `<span class="yao ${isYang(v)?"yang":"yin"}${showChg&&isChg(v)?" chg":""}"><span></span><span></span></span>`}).join("");
+  return `<div class="hexcard show"><div class="tag">${tag}</div><div class="mini">${mini}</div><div class="hh">${hx.hanja}</div><div class="hn">제${hx.num}괘 ${hx.full}</div><div class="ht">상괘 ${hx.up.ko}${hx.up.sym}${hx.up.h} · 하괘 ${hx.lo.ko}${hx.lo.sym}${hx.lo.h}</div><div class="hk">${hx.kw}</div></div>`;
+}
+function resultHTML(){
+  const R=state.reading;if(!R.complete)return "";
+  const b=benGua(R.lines),chg=R.lines.some(isChg);
+  if(!chg) return `<div class="hexcards">${hexCardHTML("본괘",b,R.lines,false)}</div><p class="nochg">동효가 없어 본괘로만 봅니다.</p>`;
+  const z=zhiGua(R.lines),zl=R.lines.map(v=>v===9?8:v===6?7:v);
+  return `<div class="hexcards">${hexCardHTML("본괘",b,R.lines,true)}<span class="arrow" aria-hidden="true">→</span>${hexCardHTML("지괘",z,zl,false)}</div>`;
+}
+function renderIching(){
+  const R=state.reading,table=$("#table");
+  const last=R.coins[R.coins.length-1];
+  table.innerHTML=`${headHTML(`주역점, ${METHOD[R.method]}`)}
+  <div class="iching">
+    <div id="castview">${R.complete?"":coinsHTML(last,false)}</div>
+    <div class="castmsg" id="castmsg">${R.complete?"":castMsg()}</div>
+    <div class="hexbuild" id="hexbuild">${rowsHTML(-1)}</div>
+    <div id="hexresult" style="width:100%">${resultHTML()}</div>
+    ${R.complete?"":`<div class="dock castdock" id="castdock"><button class="bigpick" id="castBtn"${state.mode==="auto"?" disabled":""}>${castBtnText()}</button></div>`}
+  </div>`;
+  renderResults();updateButtons();
+}
+function castMsg(){
+  const R=state.reading,n=R.lines.length;
+  if(n===0) return R.method==="coin"?"동전 세 개를 던져 맨 아래 효부터 쌓아 올립니다.":"시초 49개를 나누는 확률로 맨 아래 효부터 얻습니다.";
+  const v=R.lines[n-1];
+  const sum=R.method==="coin"&&R.coins[n-1]?R.coins[n-1].join(" + ")+" = ":"";
+  return `${YPOS[n-1]}효: ${sum}${v} (${VNAME[v]}${isChg(v)?", 변하는 효":""})`;
+}
+function castBtnText(){const n=state.reading.lines.length;return n>=6?"완성":`던지기 · ${YPOS[n]}효 (${n+1}/6)`}
+function castOne(after){
+  const R=state.reading;if(!R||R.deck!=="iching"||R.complete||casting)return;
+  casting=true;buzz();
+  const {v,coins}=castValue(R.method);
+  const btn=$("#castBtn");if(btn)btn.disabled=true;
+  const cv=$("#castview");if(cv) cv.innerHTML=coinsHTML(R.method==="coin"?coins:null,!RM());
+  const done=()=>{
+    R.lines.push(v);R.coins.push(coins);
+    const idx=R.lines.length-1;
+    $("#hexbuild").innerHTML=rowsHTML(idx);
+    $("#castmsg").textContent=castMsg();
+    casting=false;
+    if(R.lines.length===6){completeIching()}
+    else{const b=$("#castBtn");if(b){b.textContent=castBtnText();b.disabled=state.mode==="auto"}}
+    renderResults();updateButtons();
+    if(after) after();
+  };
+  RM()?done():setTimeout(done,R.method==="coin"?760:820);
+}
+function completeIching(){
+  const R=state.reading;R.complete=true;
+  pushHistory({deck:"iching",method:R.method,question:R.question,time:R.time,lines:R.lines,coins:R.coins});
+  const d=$("#castdock");if(d){d.classList.add("pickarea");setTimeout(()=>d.classList.add("gone"),200)}
+  setTimeout(()=>{
+    $("#hexresult").innerHTML=resultHTML();
+    document.querySelectorAll(".hexcard").forEach((c,j)=>setTimeout(()=>dust(c),j*250+300));
+    const hr=$("#hexresult");if(hr&&useRibbon()) hr.scrollIntoView({behavior:RM()?"auto":"smooth",block:"center"});
+  },RM()?0:350);
+  const chg=R.lines.map((v,i)=>isChg(v)?yaoName(i,v):null).filter(Boolean);
+  status(`괘가 완성되었습니다. ${chg.length?`동효 ${chg.join(", ")}`:"동효 없음"}.`);
+}
 
 /* ---------- 결과 ---------- */
 function renderResults(){
   const R=state.reading,box=$("#results");
   if(!R){box.innerHTML='<p class="hint">아직 뽑은 카드가 없습니다.</p>';return}
+  if(R.deck==="iching"){
+    if(!R.lines.length){box.innerHTML='<p class="hint">효를 얻으면 여기에 정리됩니다.</p>';return}
+    if(!R.complete){box.innerHTML=`<p class="hint">${R.lines.length}/6효를 얻었습니다. ${R.lines.map((v,i)=>yaoName(i,v)).join(", ")}</p>`;return}
+    const b=benGua(R.lines),chg=R.lines.map((v,i)=>isChg(v)?yaoName(i,v):null).filter(Boolean);
+    let h=`<ol class="results"><li><div class="r-pos">본괘</div><div><span class="r-name">제${b.num}괘 ${b.full}</span><span class="r-sub">${b.hanja}</span></div><div class="r-kw">${b.kw}</div></li>`;
+    h+=`<li><div class="r-pos">여섯 효 (아래부터)</div><div class="r-kw">${R.lines.map((v,i)=>`${yaoName(i,v)}${isChg(v)?"<span class=\"r-rev\">동</span>":""}`).join(", ")}</div></li>`;
+    if(chg.length){const z=zhiGua(R.lines);h+=`<li><div class="r-pos">지괘 (동효 ${chg.join(", ")})</div><div><span class="r-name">제${z.num}괘 ${z.full}</span><span class="r-sub">${z.hanja}</span></div><div class="r-kw">${z.kw}</div></li>`}
+    else h+=`<li><div class="r-pos">동효</div><div class="r-kw">없음</div></li>`;
+    box.innerHTML=h+"</ol>";return;
+  }
+  if(R.deck==="gua"&&R.open[0]){
+    const c=BYID[R.cards[0].id];
+    let h=`<ol class="results"><li><div class="r-pos">본괘</div><div><span class="r-name">제${c.num}괘 ${c.title}</span><span class="r-sub">${c.sub}</span></div><div class="r-kw">${c.kw}</div></li>`;
+    if(R.moving!=null){const L=guaLines(c,R.moving),z=zhiGua(L);
+      h+=`<li><div class="r-pos">동효</div><div class="r-kw">${yaoName(R.moving,L[R.moving])}</div></li><li><div class="r-pos">지괘</div><div><span class="r-name">제${z.num}괘 ${z.full}</span><span class="r-sub">${z.hanja}</span></div><div class="r-kw">${z.kw}</div></li>`}
+    else h+=`<li><div class="r-pos">동효</div><div class="r-closed">뽑지 않음 (괘사로 읽기)</div></li>`;
+    box.innerHTML=h+"</ol>";return;
+  }
   const sp=curSpread();
   if(!R.open.some(Boolean)){box.innerHTML=`<p class="hint">${R.placed?`${R.placed}장이 놓였습니다. `:""}카드를 뒤집으면 여기에 정리됩니다.</p>`;return}
   box.innerHTML='<ol class="results">'+sp.pos.map((p,i)=>{
@@ -613,22 +987,40 @@ function renderResults(){
 }
 function updateButtons(){
   const R=state.reading;
+  if(R&&R.deck==="iching"){$("#flipAllBtn").disabled=true;$("#copyBtn").disabled=!R.complete;return}
   $("#flipAllBtn").disabled=!R||R.cards.every((c,i)=>!c||R.open[i]);
   $("#copyBtn").disabled=!R||!R.placed;
 }
 
 /* ---------- 복사 ---------- */
 function readingText(R){
+  if(R.deck==="iching"){
+    const b=benGua(R.lines),chg=R.lines.map((v,i)=>isChg(v)?yaoName(i,v):null).filter(Boolean);
+    const lines=[`[주역점] ${METHOD[R.method]} (${fmtTime(R.time)})`];
+    if(R.question) lines.push("질문: "+R.question);
+    lines.push(`본괘: 제${b.num}괘 ${b.full}(${b.hanja})`);
+    lines.push("효(아래부터): "+R.lines.map((v,i)=>`${yaoName(i,v)}=${v}${isChg(v)?"(동)":""}`).join(", "));
+    if(chg.length){const z=zhiGua(R.lines);lines.push(`동효: ${chg.join(", ")}`);lines.push(`지괘: 제${z.num}괘 ${z.full}(${z.hanja})`)}
+    else lines.push("동효: 없음");
+    return lines.join("\n");
+  }
+  if(R.deck==="gua"){
+    const c=BYID[R.cards[0].id],out=[`[주역점] 괘 카드 (${fmtTime(R.time)})`];
+    if(R.question) out.push("질문: "+R.question);
+    out.push(`본괘: 제${c.num}괘 ${c.title}(${c.sub})`);
+    if(R.moving!=null){const L=guaLines(c,R.moving),z=zhiGua(L);out.push(`동효: ${yaoName(R.moving,L[R.moving])}`);out.push(`지괘: 제${z.num}괘 ${z.full}(${z.hanja})`)}
+    else out.push("동효: 뽑지 않음");
+    return out.join("\n");
+  }
   const sp=spreadFor(R.deck,R.spread,R.cards.length);
-  const when=new Date(R.time).toLocaleString("ko-KR",{dateStyle:"medium",timeStyle:"short"});
-  const lines=[`[${DECKS[R.deck].name}] ${R.spreadName}, ${R.cards.length}장 (${when})`];
+  const lines=[`[${DECKS[R.deck].name}] ${R.spreadName}, ${R.cards.length}장 (${fmtTime(R.time)})`];
   if(R.question) lines.push("질문: "+R.question);
   R.cards.forEach((cd,i)=>{
     const p=sp.pos[i]||{l:""};
     if(!cd){lines.push(`${i+1}. ${p.l?p.l+": ":""}(미선택)`);return}
     const c=BYID[cd.id];
     let t=`${i+1}. ${p.l?p.l+": ":""}${c.title}${cd.rev?" (역방향)":""}`;
-    if(R.deck==="bel") t+=` / ${c.num!==""?c.num+"번 ":""}${c.sub}`; else t+=` / ${c.sub}`;
+    t+=R.deck==="bel"?` / ${c.num!==""?c.num+"번 ":""}${c.sub}`:` / ${c.sub}`;
     lines.push(t);
   });
   return lines.join("\n");
@@ -640,7 +1032,7 @@ async function copyText(t){
 $("#copyBtn").addEventListener("click",async()=>{
   if(!state.reading)return;
   const ok=await copyText(readingText(state.reading));
-  status(ok?"결과를 복사했습니다. 뒤집지 않은 카드도 포함됩니다.":"이 브라우저에서는 복사가 막혀 있습니다. 아래 목록을 직접 선택해 복사하세요.");
+  status(ok?(state.reading.deck==="iching"?"결과를 복사했습니다.":"결과를 복사했습니다. 뒤집지 않은 카드도 포함됩니다."):"이 브라우저에서는 복사가 막혀 있습니다. 아래 목록을 직접 선택해 복사하세요.");
 });
 let stT;function status(m){const s=$("#status");s.textContent=m;clearTimeout(stT);stT=setTimeout(()=>s.textContent="",5000)}
 
@@ -649,20 +1041,32 @@ function renderHistory(){
   $("#histEmpty").hidden=history.length>0;
   $("#clearHist").hidden=history.length===0;
   $("#history").innerHTML=history.map((h,k)=>{
-    const when=new Date(h.time).toLocaleString("ko-KR",{dateStyle:"short",timeStyle:"short"});
-    const names=h.cards.map(cd=>nameOf(BYID[cd.id],cd.rev)).join(", ");
-    return `<li><div class="h-meta">${when}, ${DECKS[h.deck].name} ${esc(h.spreadName||"")}</div>${h.question?`<div class="h-q">${esc(h.question)}</div>`:""}<div class="h-cards">${names}</div><button class="linkbtn" data-h="${k}">테이블에 다시 펼치기</button></li>`;
+    let meta,body;
+    if(h.deck==="iching"){
+      const b=benGua(h.lines),chg=h.lines.map((v,i)=>isChg(v)?yaoName(i,v):null).filter(Boolean);
+      meta=`주역점, ${METHOD[h.method]||""}`;
+      body=chg.length?`${b.full} → ${zhiGua(h.lines).full} (${chg.join(", ")} 동)`:`${b.full} (동효 없음)`;
+    }else if(h.deck==="gua"){
+      const c=BYID[h.cards[0].id];meta="주역점, 괘 카드";
+      if(h.moving!=null){const L=guaLines(c,h.moving);body=`${c.title} → ${zhiGua(L).full} (${yaoName(h.moving,L[h.moving])} 동)`}
+      else body=`${c.title} (동효 없음)`;
+    }else{
+      meta=`${DECKS[h.deck].name} ${esc(h.spreadName||"")}`;
+      body=h.cards.map(cd=>nameOf(BYID[cd.id],cd.rev)).join(", ");
+    }
+    return `<li><div class="h-meta">${fmtTime(h.time,true)}, ${meta}</div>${h.question?`<div class="h-q">${esc(h.question)}</div>`:""}<div class="h-cards">${body}</div><button class="linkbtn" data-h="${k}">테이블에 다시 펼치기</button></li>`;
   }).join("");
 }
 $("#history").addEventListener("click",e=>{
   const b=e.target.closest("[data-h]");if(!b)return;
   const h=history[+b.dataset.h];if(!h)return;
-  state.reading={...h,n:h.cards.length,pool:[],cards:h.cards.slice(),open:h.cards.map(()=>true),placed:h.cards.length,complete:true};
+  if(h.deck==="iching") state.reading={...h,lines:h.lines.slice(),coins:(h.coins||[]).slice(),complete:true};
+  else state.reading={...h,n:h.cards.length,pool:[],cards:h.cards.slice(),open:h.cards.map(()=>true),placed:h.cards.length,complete:true,moving:h.moving??null};
   renderTable({deal:true});$("#table").scrollIntoView({behavior:RM()?"auto":"smooth",block:"start"});
 });
 $("#clearHist").addEventListener("click",()=>{history=[];saveHistory();renderHistory();status("기록을 지웠습니다.")});
 
-renderSpreadRow();updateDrawLabel();renderTable();renderHistory();
+renderSpreadRow();renderTable();renderHistory();
 if("serviceWorker" in navigator&&location.protocol.startsWith("http")){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
 </script>
 </body></html>
